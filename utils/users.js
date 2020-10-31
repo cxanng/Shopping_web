@@ -75,12 +75,12 @@ const emailInUse = email => {
 const getUser = (email, password) => {
   // TODO: 8.3 Get user whose email and password match the provided values
 
-  const index = data.users.findIndex(element => element.email === email 
-                                       && element.password === password);
-  if (index === -1) {
-    return undefined;
+  const user = data.users.find(element =>
+    element.email === email && element.password === password);
+  if (!user) {
+    return user;
   }
-  return Object.assign({}, data.users[index]);
+  return { ...user };
 };
 
 /**
@@ -95,11 +95,11 @@ const getUser = (email, password) => {
 const getUserById = userId => {
   // TODO: 8.3 Find user by user id
 
-  const index = data.users.findIndex(element => element._id === userId)
-  if (index === -1) {
+  const user = data.users.find(element => element._id === userId);
+  if (!user) {
     return undefined;
   }
-  return Object.assign({}, data.users[index]);
+  return { ...user };
 };
 
 /**
@@ -111,13 +111,11 @@ const getUserById = userId => {
 const deleteUserById = userId => {
   // TODO: 8.3 Delete user with a given id
   // throw new Error('Not Implemented');
-  const user = data.users.find(element => element._id === userId)
   const index = data.users.findIndex(element => element._id === userId);
   if (index === -1) {
     return undefined;
   }
-  data.users.splice(index,1)
-  return Object.assign({}, user);
+  return data.users.splice(index, 1)[0];
 };
 
 /**
@@ -128,15 +126,7 @@ const deleteUserById = userId => {
  *
  * @returns {Array<Object>} all users
  */
-const getAllUsers = () => {
-  // TODO: 8.3 Retrieve all users
-  // throw new Error('Not Implemented');
-  const arr = [];
-  data.users.forEach(element => {
-    arr.push(Object.assign({},element));
-  })
-  return arr;
-};
+const getAllUsers = () => data.users.map(user => ({ ...user }));
 
 /**
  * Save new user
@@ -154,13 +144,13 @@ const saveNewUser = user => {
   // TODO: 8.3 Save new user
   // Use generateId() to assign a unique id to the newly created user.
   // throw new Error('Not Implemented');
-  const copy = {...user};
-  copy._id = generateId();
-  if (! data.roles.includes(copy.role)) {
-    copy.role = "customer";
-  }
-  data.users.push(copy);
-  return Object.assign({}, copy);
+  const copy = {
+    ...user,
+    _id: generateId(),
+    role: data.roles.includes(user.role) ? user.role : "customer"
+  };
+  data.users = data.users.concat(copy);
+  return copy;
 };
 
 /**
@@ -182,12 +172,13 @@ const updateUserRole = (userId, role) => {
   if (!data.roles.includes(role)) {
     throw new Error("Unknown role");
   }
-  const index = data.users.findIndex(element => element._id === userId);
-  if (index === -1) {
+  let updatedUser = data.users.find(element => element._id === userId);
+  if (!updatedUser) {
     return undefined;
   }
-  data.users[index].role = role;
-  return Object.assign({}, data.users[index]);
+  updatedUser = { ...updatedUser, role};
+  data.users = data.users.map(user => user._id !== userId ? user : updatedUser);
+  return updatedUser;
 };
 
 /**
@@ -202,12 +193,12 @@ const updateUserRole = (userId, role) => {
 const validateUser = user => {
   // TODO: 8.3 Validate user before saving
   // throw new Error('Not Implemented');
-  const arr = [];
-  ["email", "password", "name"].forEach(prop => {
-    if (!Object.keys(user).includes(prop)) {
-      arr.push('Missing '+ prop);
-    } 
-  })
+  const arr = ["email", "password", "name"].reduce((acc, field) => {
+    if (!Object.keys(user).includes(field)) {
+      return acc.concat(`Missing ${field}`);
+    }
+    return acc;
+  }, []);
   if (Object.keys(user).includes("role") && !data.roles.includes(user.role)) {
     arr.push("Unknown role");
   }
