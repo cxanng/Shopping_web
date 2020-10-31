@@ -56,7 +56,10 @@ const generateId = () => {
  */
 const emailInUse = email => {
   // TODO: 8.3 Check if there already exists a user with a given email
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  
+  return data.users.some((element) => element.email === email);
+  
 };
 
 /**
@@ -71,7 +74,13 @@ const emailInUse = email => {
  */
 const getUser = (email, password) => {
   // TODO: 8.3 Get user whose email and password match the provided values
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  data.users.forEach(element => {
+    if (element.email === email && element.password === password) {
+      return Object.assign({},element);
+    }
+  });
+  return undefined
 };
 
 /**
@@ -85,7 +94,13 @@ const getUser = (email, password) => {
  */
 const getUserById = userId => {
   // TODO: 8.3 Find user by user id
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  data.users.forEach(element => {
+    if (element._id === userId) {
+      return Object.assign(element);
+    }
+  })
+  return undefined;
 };
 
 /**
@@ -96,7 +111,15 @@ const getUserById = userId => {
  */
 const deleteUserById = userId => {
   // TODO: 8.3 Delete user with a given id
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  data.users.forEach(element => {
+    if (element._id === userId) {
+      const index = data.users.indexOf(element);
+      data.users.splice(index,1);
+      return element;
+    }
+  })
+  return undefined;
 };
 
 /**
@@ -109,7 +132,12 @@ const deleteUserById = userId => {
  */
 const getAllUsers = () => {
   // TODO: 8.3 Retrieve all users
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  const arr = [];
+  data.users.forEach(element => {
+    arr.push(Object.assign({},element));
+  })
+  return arr;
 };
 
 /**
@@ -127,7 +155,14 @@ const getAllUsers = () => {
 const saveNewUser = user => {
   // TODO: 8.3 Save new user
   // Use generateId() to assign a unique id to the newly created user.
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  const copy = {...user};
+  copy._id = generateId();
+  if (! copy.some((property) => property === "role")) {
+    copy.role = "customer";
+  }
+  data.users.push(copy);
+  return Object.assign({}, copy);
 };
 
 /**
@@ -145,7 +180,10 @@ const saveNewUser = user => {
  */
 const updateUserRole = (userId, role) => {
   // TODO: 8.3 Update user's role
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  if (data.roles.includes(role)) {
+    throw new Error("Unknown role");
+  }
 };
 
 /**
