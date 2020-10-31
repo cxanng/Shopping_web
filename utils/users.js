@@ -181,9 +181,16 @@ const saveNewUser = user => {
 const updateUserRole = (userId, role) => {
   // TODO: 8.3 Update user's role
   // throw new Error('Not Implemented');
-  if (data.roles.includes(role)) {
+  if (!data.roles.includes(role)) {
     throw new Error("Unknown role");
   }
+  data.users.forEach(element => {
+    if (element._id === userId) {
+      element.role = role;
+      return Object.assign({}, element);
+    }
+  });
+  return undefined;
 };
 
 /**
@@ -197,7 +204,17 @@ const updateUserRole = (userId, role) => {
  */
 const validateUser = user => {
   // TODO: 8.3 Validate user before saving
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  const arr = [];
+  ["email", "password", "name"].forEach(prop => {
+    if (!Object.keys(user).includes(prop)) {
+      arr.push('Missing '+ prop);
+    } 
+  })
+  if (Object.keys(user).includes("role") && !data.roles.includes(user.role)) {
+    arr.push("Unknown role");
+  }
+  return arr;
 };
 
 module.exports = {
@@ -211,3 +228,4 @@ module.exports = {
   updateUserRole,
   validateUser
 };
+console.log(validateUser({}));
