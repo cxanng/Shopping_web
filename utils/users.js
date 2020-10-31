@@ -74,13 +74,13 @@ const emailInUse = email => {
  */
 const getUser = (email, password) => {
   // TODO: 8.3 Get user whose email and password match the provided values
-  // throw new Error('Not Implemented');
-  data.users.forEach(element => {
-    if (element.email === email && element.password === password) {
-      return Object.assign({},element);
-    }
-  });
-  return undefined
+
+  const index = data.users.findIndex(element => element.email === email 
+                                       && element.password === password);
+  if (index === -1) {
+    return undefined;
+  }
+  return Object.assign({}, data.users[index]);
 };
 
 /**
@@ -94,13 +94,12 @@ const getUser = (email, password) => {
  */
 const getUserById = userId => {
   // TODO: 8.3 Find user by user id
-  // throw new Error('Not Implemented');
-  data.users.forEach(element => {
-    if (element._id === userId) {
-      return Object.assign(element);
-    }
-  })
-  return undefined;
+
+  const index = data.users.findIndex(element => element._id === userId)
+  if (index === -1) {
+    return undefined;
+  }
+  return Object.assign({}, data.users[index]);
 };
 
 /**
@@ -112,14 +111,13 @@ const getUserById = userId => {
 const deleteUserById = userId => {
   // TODO: 8.3 Delete user with a given id
   // throw new Error('Not Implemented');
-  data.users.forEach(element => {
-    if (element._id === userId) {
-      const index = data.users.indexOf(element);
-      data.users.splice(index,1);
-      return element;
-    }
-  })
-  return undefined;
+  const user = data.users.find(element => element._id === userId)
+  const index = data.users.findIndex(element => element._id === userId);
+  if (index === -1) {
+    return undefined;
+  }
+  data.users.splice(index,1)
+  return Object.assign({}, user);
 };
 
 /**
@@ -158,7 +156,7 @@ const saveNewUser = user => {
   // throw new Error('Not Implemented');
   const copy = {...user};
   copy._id = generateId();
-  if (! copy.some((property) => property === "role")) {
+  if (! data.roles.includes(copy.role)) {
     copy.role = "customer";
   }
   data.users.push(copy);
@@ -184,13 +182,12 @@ const updateUserRole = (userId, role) => {
   if (!data.roles.includes(role)) {
     throw new Error("Unknown role");
   }
-  data.users.forEach(element => {
-    if (element._id === userId) {
-      element.role = role;
-      return Object.assign({}, element);
-    }
-  });
-  return undefined;
+  const index = data.users.findIndex(element => element._id === userId);
+  if (index === -1) {
+    return undefined;
+  }
+  data.users[index].role = role;
+  return Object.assign({}, data.users[index]);
 };
 
 /**
@@ -228,4 +225,3 @@ module.exports = {
   updateUserRole,
   validateUser
 };
-console.log(validateUser({}));
