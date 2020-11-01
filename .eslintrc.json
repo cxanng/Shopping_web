@@ -16,7 +16,7 @@
   "noInlineConfig": true,
   "rules": {
     "semi": ["error", "always"],
-    "quotes": "off",
+    "quotes": ["error", "double", { "avoidEscape": true }],
     "no-dupe-else-if": ["error"],
     "eqeqeq": ["error", "always"],
     "no-implicit-globals": "error",
@@ -36,8 +36,10 @@
     "require-await": "warn",
     "no-shadow": "warn",
     "comma-spacing": "warn",
-    "max-lines-per-function": ["warn", 60],
+    "max-lines-per-function": ["warn", 100],
     "prefer-object-spread": "warn",
-    "prefer-template": "warn"
+    "prefer-template": "warn",
+    "no-trailing-spaces": "error",
+    "object-curly-spacing": ["error", "always"]
   }
 }
