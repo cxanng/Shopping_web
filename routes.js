@@ -1,7 +1,8 @@
 const responseUtils = require("./utils/responseUtils");
-const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
+const { acceptsJson, isJson, parseBodyJson, getCredentials } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { emailInUse, getAllUsers, saveNewUser, validateUser } = require("./utils/users");
+const { emailInUse, getAllUsers, saveNewUser, validateUser, getUser } = require("./utils/users");
+const { getCurrentUser } = require("./auth/auth");
 
 /**
  * Known API routes and their allowed methods
@@ -92,9 +93,26 @@ const handleRequest = async (request, response) => {
   // GET all users
   if (filePath === "/api/users" && method.toUpperCase() === "GET") {
     // TODO: 8.3 Return all users as JSON
-    return responseUtils.sendJson(response, getAllUsers());
     // TODO: 8.4 Add authentication (only allowed to users with role "admin")
-
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const credential = getCredentials(request);
+      if (credential) {
+        const user = getUser(credential[0], credential[1]);
+        if (!user) {
+          return responseUtils.basicAuthChallenge(response);
+        }
+        if (user.role === "admin") {
+          return responseUtils.sendJson(response, getAllUsers());
+        }
+        else if (user.role === "customer") {
+          return responseUtils.forbidden(response);
+        }
+      }
+    }
+    else {
+      return responseUtils.basicAuthChallenge(response);
+    }
   }
 
   // register new user
