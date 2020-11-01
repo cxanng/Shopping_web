@@ -7,3 +7,5 @@
  *       - Reset the form back to empty after successful registration
  *       - Use postOrPutJSON() function from utils.js to send your data back to server
  */
+
+const form = document.getElementById("register-form");
