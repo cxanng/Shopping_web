@@ -71,7 +71,10 @@ const postOrPutJSON = async (url, method, data = {}) => {
  */
 const deleteResourse = async url => {
   // TODO: 8.5 Implement this
-  throw new Error('Not Implemented');
+  const response = await fetch(url, 
+    {method: "DELETE"})
+    .then(response => response.json)
+    .then(data => resolve(data));
 };
 
 /**
