@@ -1,8 +1,9 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson, getCredentials } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { emailInUse, getAllUsers, saveNewUser, validateUser, getUser } = require("./utils/users");
+const { emailInUse, getAllUsers, saveNewUser, validateUser, getUser, updateUserRole, getUserById, deleteUserById } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
+const { sendJson } = require("./utils/responseUtils");
 
 /**
  * Known API routes and their allowed methods
@@ -71,7 +72,53 @@ const handleRequest = async (request, response) => {
   if (matchUserId(filePath)) {
     // TODO: 8.5 Implement view, update and delete a single user by ID (GET, PUT, DELETE)
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
-    throw new Error("Not Implemented");
+    // throw new Error("Not Implemented");
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const credential = getCredentials(request);
+      if (credential) {
+        const user = getUser(credential[0], credential[1]);
+        if (!user) {
+          return responseUtils.basicAuthChallenge(response);
+        }
+        if (user && user.role === "admin") {
+          const userToProcess = getUserById(url.split("/")[3]);
+              if (!userToProcess) {
+                return responseUtils.notFound(response);
+              }
+              else {
+                if (method.toUpperCase() === "GET") {
+                  return responseUtils.sendJson(response, userToProcess);
+                }
+                else if (method.toUpperCase() === "PUT") {
+                  const data = await parseBodyJson(request);
+                  if (!data.role) {
+                    return responseUtils.badRequest(response, "Missing role!");
+                  }
+                  else if (data.role !== "admin" && data.role !== "customer") {
+                    return responseUtils.badRequest(response, "Unknown role!");
+                  }
+                  return responseUtils.sendJson(response,
+                        updateUserRole(url.split("/")[3], data.role));
+                }
+                else if (method.toUpperCase() === "DELETE") {
+                  return responseUtils.sendJson(response,
+                        deleteUserById(url.split("/")[3]));
+                }
+              }
+        }
+        else if (user && user.role === "customer") {
+          return responseUtils.forbidden(response);
+        }
+        else {
+          return responseUtils.notFound(response);
+        }
+      }
+    }
+    else {
+      return responseUtils.basicAuthChallenge(response);
+    }
+
   }
 
   // Default to 404 Not Found if unknown url
@@ -127,26 +174,14 @@ const handleRequest = async (request, response) => {
     const json = await parseBodyJson(request);
     const validateMsg = validateUser(json);
     const userInuse = emailInUse(json.email);
-    if (
-      validateMsg.includes("Missing email") ||
-      validateMsg.includes("Missing name") ||
-      validateMsg.includes("Missing password") ||
-      userInuse
-    ) {
+    if ( validateMsg.length > 0 || userInuse) {
       json["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
-      response.writeHead(400, {
-        "Content-type": "application/json"
-      });
-      response.write(JSON.stringify(json));
-      response.end();
-    } else {
+      return responseUtils.badRequest(response, json["error"]);
+    }
+    else {
       const newUser = saveNewUser(json);
       const updatedUser = { ...newUser, role: "customer" };
-      response.writeHead(201, {
-        "Content-type": "application/json"
-      });
-      response.write(JSON.stringify(updatedUser));
-      response.end();
+      return responseUtils.createdResource(response, updatedUser);
     }
   }
 };
