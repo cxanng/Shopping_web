@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 /**
  * Get database connect URL.
@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
  */
 const getDbUrl = () => {
   // TODO: 9.3 Implement this
-  throw new Error('Implement this');
+  throw new Error("Implement this");
 };
 
 function connectDB () {
@@ -25,11 +25,11 @@ function connectDB () {
         autoIndex: true
       })
       .then(() => {
-        mongoose.connection.on('error', err => {
+        mongoose.connection.on("error", err => {
           console.error(err);
         });
 
-        mongoose.connection.on('reconnectFailed', handleCriticalError);
+        mongoose.connection.on("reconnectFailed", handleCriticalError);
       })
       .catch(handleCriticalError);
   }

@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
+const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -17,7 +17,7 @@ userSchema.methods.checkPassword = async function (password) {
 };
 
 // Omit the version key when serialized to JSON
-userSchema.set('toJSON', { virtuals: false, versionKey: false });
+userSchema.set("toJSON", { virtuals: false, versionKey: false });
 
-const User = new mongoose.model('User', userSchema);
+const User = new mongoose.model("User", userSchema);
 module.exports = User;
