@@ -71,10 +71,13 @@ const postOrPutJSON = async (url, method, data = {}) => {
  */
 const deleteResourse = async url => {
   // TODO: 8.5 Implement this
-  const response = await fetch(url, 
-    {method: "DELETE"})
-    .then(response => response.json)
-    .then(data => resolve(data));
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json"
+    },
+    method: "DELETE"
+  });
+  return response.json();
 };
 
 /**

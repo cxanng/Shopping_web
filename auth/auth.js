@@ -7,7 +7,7 @@ const { getUser } = require("../utils/users.js");
  * @param {http.IncomingMessage} request
  * @returns {Object|null} current authenticated user or null if not yet authenticated
  */
-const getCurrentUser = async request => {
+const getCurrentUser = request => {
   // TODO: 8.4 Implement getting current user based on the "Authorization" request header
 
   // NOTE: You can use getCredentials(request) function from utils/requestUtils.js
@@ -16,10 +16,7 @@ const getCurrentUser = async request => {
 
   // throw new Error('Not Implemented');
   const data = getCredentials(request);
-  if (data !== null) {
-    return getUser(data[0], data[1]);
-  }
-  return null;
+  return data ? getUser(data[0], data[1]) : null;
 };
 
 module.exports = { getCurrentUser };

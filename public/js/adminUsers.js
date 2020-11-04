@@ -34,10 +34,62 @@
  */
 
 const template = document.getElementById("user-template");
+const formTemplate = document.getElementById("form-template");
 const container = document.getElementById("users-container");
-const idTemplate = ["user", "name", "email", "role", "modify"];
+const formContainer = document.getElementById("modify-user");
 
-getJSON("http://localhost:3000/api/users").then(people => {
+const URL = "http://localhost:3000/api/users";
+
+const updatePersonInfo = ({_id, role}) => {
+  const roleText = document.getElementById(`role-${_id}`);
+  roleText.innerText = role;
+};
+
+const handleModify = ({_id, name, email, role}) => {
+  const form = formTemplate.content.cloneNode(true).querySelector("form");
+  form.querySelector("h2").innerText = `Modify user ${name}`;
+
+  const idField = form.querySelector("#id-input");
+  idField.value = _id;
+  const nameField = form.querySelector("#name-input");
+  nameField.value = name;
+  const emailField = form.querySelector("#email-input");
+  emailField.value = email;
+  const roleField = form.querySelector("#role-input");
+  roleField.value = role;
+
+  form.querySelector("#update-button").addEventListener("click", async e => {
+    e.preventDefault();
+
+    const updatedPerson = await postOrPutJSON(`${URL}/${_id}`, "PUT", {
+      name,
+      email,
+      role: roleField.value
+    });
+    createNotification(
+      `Updated user ${name}`,
+      "notifications-container",
+      true
+    );
+    updatePersonInfo(updatedPerson);
+    removeElement("modify-user", "edit-user-form");
+  })
+
+  formContainer.appendChild(form);
+};
+
+const handleDelete = async ({_id, name}) => {
+  await deleteResourse(`${URL}/${_id}`);
+  createNotification(
+    `Deleted user ${name}`,
+    "notifications-container",
+    true
+  );
+  removeElement("users-container", `user-${_id}`);
+  removeElement("modify-user", "edit-user-form");
+};
+
+const renderPeople = people => {
   people.forEach(person => {
     const id = person._id;
     const newPerson = template.content.cloneNode(true);
@@ -59,10 +111,19 @@ getJSON("http://localhost:3000/api/users").then(people => {
 
     const modifyBtn = itemRow.querySelector(".modify-button");
     modifyBtn.setAttribute("id", `modify-${id}`);
+    modifyBtn.addEventListener("click", () => handleModify(person));
 
     const deleteBtn = itemRow.querySelector(".delete-button");
     deleteBtn.setAttribute("id", `delete-${id}`);
+    deleteBtn.addEventListener("click", () => handleDelete(person))
 
     container.appendChild(itemRow);
   });
-});
+};
+
+const adminUser = async () => {
+  const people = await getJSON(URL);
+  renderPeople(people);
+};
+
+adminUser();

@@ -82,15 +82,15 @@ const isJson = request => {
  */
 const parseBodyJson = request => {
   return new Promise((resolve, reject) => {
-    let body = '';
+    let body = "";
 
-    request.on('error', err => reject(err));
+    request.on("error", err => reject(err));
 
-    request.on('data', chunk => {
+    request.on("data", chunk => {
       body += chunk.toString();
     });
 
-    request.on('end', () => {
+    request.on("end", () => {
       resolve(JSON.parse(body));
     });
   });

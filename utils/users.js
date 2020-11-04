@@ -14,8 +14,8 @@
  */
 const data = {
   // make copies of users (prevents changing from outside this module/file)
-  users: require('../users.json').map(user => ({ ...user })),
-  roles: ['customer', 'admin']
+  users: require("../users.json").map(user => ({ ...user })),
+  roles: ["customer", "admin"]
 };
 
 /**
@@ -27,7 +27,7 @@ const data = {
  */
 const resetUsers = () => {
   // make copies of users (prevents changing from outside this module/file)
-  data.users = require('../users.json').map(user => ({ ...user }));
+  data.users = require("../users.json").map(user => ({ ...user }));
 };
 
 /**
@@ -57,9 +57,7 @@ const generateId = () => {
 const emailInUse = email => {
   // TODO: 8.3 Check if there already exists a user with a given email
   // throw new Error('Not Implemented');
-  
   return data.users.some((element) => element.email === email);
-  
 };
 
 /**
@@ -176,7 +174,7 @@ const updateUserRole = (userId, role) => {
   if (!updatedUser) {
     return undefined;
   }
-  updatedUser = { ...updatedUser, role};
+  updatedUser = { ...updatedUser, role };
   data.users = data.users.map(user => user._id !== userId ? user : updatedUser);
   return updatedUser;
 };

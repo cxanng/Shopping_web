@@ -81,33 +81,36 @@ const handleRequest = async (request, response) => {
         if (!user) {
           return responseUtils.basicAuthChallenge(response);
         }
-        if (user && user.role === "admin") {
+        if (user.role === "admin") {
           const userToProcess = getUserById(url.split("/")[3]);
-              if (!userToProcess) {
-                return responseUtils.notFound(response);
+          if (!userToProcess) {
+            return responseUtils.notFound(response);
+          }
+
+          switch (method.toUpperCase()){
+            case "GET":
+              return responseUtils.sendJson(response, userToProcess);
+            case "PUT": {
+              const data = await parseBodyJson(request);
+              if (!data.role) {
+                return responseUtils.badRequest(response, "Missing role!");
               }
-              else {
-                if (method.toUpperCase() === "GET") {
-                  return responseUtils.sendJson(response, userToProcess);
-                }
-                else if (method.toUpperCase() === "PUT") {
-                  const data = await parseBodyJson(request);
-                  if (!data.role) {
-                    return responseUtils.badRequest(response, "Missing role!");
-                  }
-                  else if (data.role !== "admin" && data.role !== "customer") {
-                    return responseUtils.badRequest(response, "Unknown role!");
-                  }
-                  return responseUtils.sendJson(response,
-                        updateUserRole(url.split("/")[3], data.role));
-                }
-                else if (method.toUpperCase() === "DELETE") {
-                  return responseUtils.sendJson(response,
-                        deleteUserById(url.split("/")[3]));
-                }
+              else if (data.role !== "admin" && data.role !== "customer") {
+                return responseUtils.badRequest(response, "Unknown role!");
               }
+              return responseUtils.sendJson(
+                response,
+                updateUserRole(url.split("/")[3], data.role)
+              );
+            }
+            case "DELETE":
+              return responseUtils.sendJson(
+                response,
+                deleteUserById(url.split("/")[3])
+              );
+          }
         }
-        else if (user && user.role === "customer") {
+        else if (user.role === "customer") {
           return responseUtils.forbidden(response);
         }
         else {
@@ -152,7 +155,7 @@ const handleRequest = async (request, response) => {
         if (user.role === "admin") {
           return responseUtils.sendJson(response, getAllUsers());
         }
-        else if (user.role === "customer") {
+        if (user.role === "customer") {
           return responseUtils.forbidden(response);
         }
       }
