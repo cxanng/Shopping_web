@@ -4,6 +4,7 @@ const { renderPublic } = require("./utils/render");
 const { emailInUse, getAllUsers, saveNewUser, validateUser, getUser, updateUserRole, getUserById, deleteUserById } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
 const { sendJson } = require("./utils/responseUtils");
+const { getAllProducts } = require("./utils/products.js");
 
 /**
  * Known API routes and their allowed methods
@@ -13,7 +14,8 @@ const { sendJson } = require("./utils/responseUtils");
  */
 const allowedMethods = {
   "/api/register": ["POST"],
-  "/api/users": ["GET"]
+  "/api/users": ["GET"],
+  "/api/products": ["GET"]
 };
 
 /**
@@ -163,6 +165,22 @@ const handleRequest = async (request, response) => {
     else {
       return responseUtils.basicAuthChallenge(response);
     }
+  }
+
+  //
+  if (filePath === "/api/products" && method.toUpperCase() === "GET") {
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const credential = getCredentials(request);
+      if (credential) {
+        const user = getUser(credential[0], credential[1]);
+        if (!user) {
+          return responseUtils.basicAuthChallenge(response);
+        }
+        return responseUtils.sendJson(response, getAllProducts());
+      }
+    }
+    return responseUtils.basicAuthChallenge(response);
   }
 
   // register new user
