@@ -26,7 +26,7 @@ const renderProduct = products => {
         const addToCart = itemRow.querySelector("button");
         addToCart.setAttribute("id", `add-to-cart-${id}`);
         addToCart.innerText = "Add to cart";
-        addToCart.setAttribute("onclick", `addProduct(${id}, ${name})`);
+        addToCart.addEventListener("click", () => addProduct(id, name));
 
         container.appendChild(itemRow);
     });
@@ -36,6 +36,8 @@ const addProduct = (id, name) => {
     addProductToCart(id);
     createNotification(`Added ${name} to cart!`, "notifications-container");
 }
-
-const products = await getJSON(URL);
-renderProduct(products);
+const productLoad = async () => {
+    const products = await getJSON(URL);
+    renderProduct(products);
+}
+productLoad();

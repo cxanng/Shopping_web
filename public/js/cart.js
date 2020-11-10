@@ -3,7 +3,7 @@ const { getAllProducts } = require("../../utils/products");
 const template = document.getElementById('cart-item-template');
 const container = document.getElementById('cart-container');
 
-const renderCart = () => {
+const renderCart = async () => {
     const products = getAllProducts();
     products.forEach(product => {
         const id = product.item._id;
@@ -26,11 +26,11 @@ const renderCart = () => {
 
         const plusButton = itemRow.querySelector(".cart-minus-plus-button")[0];
         plusButton.setAttribute("id", `plus-${id}`);
-        plusButton.setAttribute("onclick", `addProduct(${id})`); 
+        plusButton.addEventListener("click", () => addProduct(id)); 
 
         const minusButton = itemRow.querySelector(".cart-minus-plus-button")[1];
         minusButton.setAttribute("id", `minus-${id}`);
-        minusButton.setAttribute("onclick", `decreaseProduct(${id})`);
+        minusButton.addEventListener("click", () => decreaseProduct(id));
 
         container.appendChild(itemRow);
     })
