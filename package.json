@@ -27,16 +27,17 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "eslint": "^7.12.1",
-    "mocha": "^8.2.0",
     "eslint-plugin-fp": "^2.3.0",
+    "mocha": "^8.2.0",
     "node-mocks-http": "^1.9.0",
     "nodemon": "^2.0.6",
-    "puppeteer": "^5.4.1",
     "nyc": "^15.1.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.10.10"
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.10.10",
+    "puppeteer": "^5.4.1"
   }
 }
