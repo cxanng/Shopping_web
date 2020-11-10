@@ -1,5 +1,3 @@
-const { getProductById } = require("../../utils/products");
-
 /**
  * Asynchronously fetch JSON from the given url. (GET)
  *
@@ -145,13 +143,15 @@ const removeElement = (containerId, elementId) => {
  * 
  * @param {string} id containing product id
  */
-const addProductToCart = (id) => {
+const addProductToCart = id => {
   if (sessionStorage.getItem(id)) {
     const productCount = parseInt(sessionStorage.getItem(id)) + 1;
     sessionStorage.setItem(id, productCount);
+    return productCount;
   }
   else {
     sessionStorage.setItem(id, 1);
+    return 1;
   }
 };
 
@@ -160,29 +160,21 @@ const addProductToCart = (id) => {
  * 
  * @param {string} id containing product id
  */
-const decreaseProductCount = (id) => {
+const decreaseProductCount = id => {
   const productCount = parseInt(sessionStorage.getItem(id));
-  if (products === 1) {
+  if (productCount === 1) {
     sessionStorage.removeItem(id);
+    return 0;
   }
   else {
     sessionStorage.setItem(id, productCount - 1);
+    return productCount - 1;
   }
-}
+};
 
-const getAllProductsFromCart = () => {
-  const cart = [];
-  for (let i = 0; i< sessionStorage.length; i++) {
-    const key = sessionStorage.key(i);
-    const product = {
-      item : getProductById(key),
-      count : parseInt(sessionStorage.getItem(key))
-    };
-    cart.push(product);
-  }
-  return cart;
-} 
+const getProductCountFromCart = id =>
+  parseInt(sessionStorage.getItem(id));
 
 const clearCart = () => {
   sessionStorage.clear();
-}
+};

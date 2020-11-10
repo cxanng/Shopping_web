@@ -26,14 +26,14 @@ const renderProduct = products => {
         const addToCart = itemRow.querySelector("button");
         addToCart.setAttribute("id", `add-to-cart-${id}`);
         addToCart.innerText = "Add to cart";
-        addToCart.addEventListener("click", () => addProduct(id, name));
+        addToCart.addEventListener("click", () => addProduct(product));
 
         container.appendChild(itemRow);
     });
 }
 
-const addProduct = (id, name) => {
-    addProductToCart(id);
+const addProduct = ({ _id, name }) => {
+    addProductToCart(_id);
     createNotification(`Added ${name} to cart!`, "notifications-container");
 }
 const productLoad = async () => {

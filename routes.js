@@ -15,7 +15,8 @@ const { getAllProducts } = require("./utils/products.js");
 const allowedMethods = {
   "/api/register": ["POST"],
   "/api/users": ["GET"],
-  "/api/products": ["GET"]
+  "/api/products": ["GET"],
+  "/api/cart": ["GET"]
 };
 
 /**

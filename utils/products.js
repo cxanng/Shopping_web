@@ -18,14 +18,14 @@ const getAllProducts = () => products.map(product => ({ ...product }));
  * @returns {Object/undefined}
  */
 const getProductById = (productId) => {
-    const product = products.find(element => element._id === productId);
-    if (!product) {
-        return undefined;
-    }
-    return { ...product };
+  const product = products.find(element => element._id === productId);
+  if (!product) {
+      return undefined;
+  }
+  return { ...product };
 };
 
 module.exports = {
-    getAllProducts,
-    getProductById
+  getAllProducts,
+  getProductById
 };
