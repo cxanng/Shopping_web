@@ -23,7 +23,7 @@
     "no-redeclare": "error",
     "no-promise-executor-return": "error",
     "no-undef": "off",
-    "no-unused-vars": "off",
+    "no-unused-vars": "error",
     "camelcase": "error",
     "arrow-spacing": "warn",
     "no-var": "error",

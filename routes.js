@@ -1,10 +1,10 @@
 const responseUtils = require("./utils/responseUtils");
-const { acceptsJson, isJson, parseBodyJson, getCredentials } = require("./utils/requestUtils");
+const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { emailInUse, getAllUsers, saveNewUser, validateUser, getUser, updateUserRole, getUserById, deleteUserById } = require("./utils/users");
+const { validateUser } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
-const { sendJson } = require("./utils/responseUtils");
 const { getAllProducts } = require("./utils/products.js");
+const User = require("./models/user");
 
 /**
  * Known API routes and their allowed methods
@@ -78,53 +78,44 @@ const handleRequest = async (request, response) => {
     // throw new Error("Not Implemented");
     const authorize = request.headers["authorization"];
     if (authorize) {
-      const credential = getCredentials(request);
-      if (credential) {
-        const user = getUser(credential[0], credential[1]);
-        if (!user) {
-          return responseUtils.basicAuthChallenge(response);
-        }
-        if (user.role === "admin") {
-          const userToProcess = getUserById(url.split("/")[3]);
-          if (!userToProcess) {
-            return responseUtils.notFound(response);
-          }
-
-          switch (method.toUpperCase()){
-            case "GET":
-              return responseUtils.sendJson(response, userToProcess);
-            case "PUT": {
-              const data = await parseBodyJson(request);
-              if (!data.role) {
-                return responseUtils.badRequest(response, "Missing role!");
-              }
-              else if (data.role !== "admin" && data.role !== "customer") {
-                return responseUtils.badRequest(response, "Unknown role!");
-              }
-              return responseUtils.sendJson(
-                response,
-                updateUserRole(url.split("/")[3], data.role)
-              );
-            }
-            case "DELETE":
-              return responseUtils.sendJson(
-                response,
-                deleteUserById(url.split("/")[3])
-              );
-          }
-        }
-        else if (user.role === "customer") {
-          return responseUtils.forbidden(response);
-        }
-        else {
-          return responseUtils.notFound(response);
-        }
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
       }
-    }
-    else {
+      if (user.role === "admin") {
+        const modifyUser = await User.findById(url.split("/")[3]).exec();
+        switch (method.toUpperCase()) {
+          case "GET":
+            return responseUtils.sendJson(response, user);
+          case "PUT": {
+            const data = await parseBodyJson(request);
+            if (!data.role) {
+              return responseUtils.badRequest(response, "Missing role!");
+            }
+            if (data.role !== "admin" && data.role !== "customer") {
+              return responseUtils.badRequest(response, "Unknown role!");
+            }
+
+            modifyUser.role = data.role;
+            const updatedUser = await modifyUser.save();
+
+            return responseUtils.sendJson(response, updatedUser);
+          }
+          case "DELETE":
+            if (!modifyUser) {
+              return responseUtils.notFound(response);
+            }
+            await User.deleteOne({ _id: url.split("/")[3] });
+            return responseUtils.sendJson(response, modifyUser);
+        }
+      } else if (user.role === "customer") {
+        return responseUtils.forbidden(response);
+      } else {
+        return responseUtils.notFound(response);
+      }
+    } else {
       return responseUtils.basicAuthChallenge(response);
     }
-
   }
 
   // Default to 404 Not Found if unknown url
@@ -149,21 +140,18 @@ const handleRequest = async (request, response) => {
     // TODO: 8.4 Add authentication (only allowed to users with role "admin")
     const authorize = request.headers["authorization"];
     if (authorize) {
-      const credential = getCredentials(request);
-      if (credential) {
-        const user = getUser(credential[0], credential[1]);
-        if (!user) {
-          return responseUtils.basicAuthChallenge(response);
-        }
-        if (user.role === "admin") {
-          return responseUtils.sendJson(response, getAllUsers());
-        }
-        if (user.role === "customer") {
-          return responseUtils.forbidden(response);
-        }
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
       }
-    }
-    else {
+      if (user.role === "admin") {
+        const allUser = await User.find({});
+        return responseUtils.sendJson(response, allUser);
+      }
+      if (user.role === "customer") {
+        return responseUtils.forbidden(response);
+      }
+    } else {
       return responseUtils.basicAuthChallenge(response);
     }
   }
@@ -172,14 +160,11 @@ const handleRequest = async (request, response) => {
   if (filePath === "/api/products" && method.toUpperCase() === "GET") {
     const authorize = request.headers["authorization"];
     if (authorize) {
-      const credential = getCredentials(request);
-      if (credential) {
-        const user = getUser(credential[0], credential[1]);
-        if (!user) {
-          return responseUtils.basicAuthChallenge(response);
-        }
-        return responseUtils.sendJson(response, getAllProducts());
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
       }
+      return responseUtils.sendJson(response, getAllProducts());
     }
     return responseUtils.basicAuthChallenge(response);
   }
@@ -193,17 +178,16 @@ const handleRequest = async (request, response) => {
 
     // TODO: 8.3 Implement registration
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
-    const json = await parseBodyJson(request);
-    const validateMsg = validateUser(json);
-    const userInuse = emailInUse(json.email);
+    const payload = await parseBodyJson(request);
+    const validateMsg = validateUser(payload);
+    const userInuse = await User.findOne({ email: payload.email });
     if ( validateMsg.length > 0 || userInuse) {
-      json["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
-      return responseUtils.badRequest(response, json["error"]);
-    }
-    else {
-      const newUser = saveNewUser(json);
-      const updatedUser = { ...newUser, role: "customer" };
-      return responseUtils.createdResource(response, updatedUser);
+      payload["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
+      return responseUtils.badRequest(response, payload["error"]);
+    } else {
+      const newUser = new User({ ...payload, role: "customer" });
+      const savedUser = await newUser.save();
+      return responseUtils.createdResource(response, savedUser);
     }
   }
 };

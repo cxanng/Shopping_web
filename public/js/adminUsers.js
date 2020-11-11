@@ -78,7 +78,7 @@ const handleModify = ({_id, name, email, role}) => {
   formContainer.appendChild(form);
 };
 
-const handleDelete = async ({_id, name}) => {
+const handleDelete = async ({ _id, name }) => {
   await deleteResourse(`${URL}/${_id}`);
   createNotification(
     `Deleted user ${name}`,
