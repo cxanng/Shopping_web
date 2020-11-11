@@ -66,4 +66,17 @@ const decreaseProduct = (id) => {
   }
 }
 
+document.getElementById("place-order-button").addEventListener(
+  "click",
+  () => {
+    createNotification(
+      "Succesfully created an order!",
+      "notifications-container",
+      true
+    );
+    clearCart();
+    document.getElementById("cart-container").innerHTML = "";
+  }
+);
+
 renderCart();
