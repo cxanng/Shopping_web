@@ -9,7 +9,7 @@ const userSchema = new Schema({
     trim: true,
     required: "Name is required",
     validate: [
-      function(input) {
+      function (input) {
         return input.length <= 50;
       }
     ]
@@ -19,23 +19,27 @@ const userSchema = new Schema({
     trim: true,
     required: "Email is required",
     unique: "Email has been used",
-    match: [/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/]
+    match: [
+      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+    ]
   },
   password: {
     type: String,
     required: "Password is required",
     validate: [
-      function(input) {
+      function (input) {
         return input.length >= 10;
       },
       "Password should be longer."
     ],
-    set: [(input) => {
-      if (input.length >= 10) {
-        const salt = bcrypt.genSaltSync(10);
-        return bcrypt.hashSync(input, salt);
+    set: [
+      input => {
+        if (input.length >= 10) {
+          const salt = bcrypt.genSaltSync(10);
+          return bcrypt.hashSync(input, salt);
+        }
       }
-    }]
+    ]
   },
   role: {
     type: String,
