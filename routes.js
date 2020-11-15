@@ -5,6 +5,7 @@ const { validateUser } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
 const { getAllProducts } = require("./utils/products.js");
 const User = require("./models/user");
+const { registerUser, getAllUsers, updateUser, viewUser, deleteUser } = require("./controllers/users");
 
 /**
  * Known API routes and their allowed methods
@@ -82,36 +83,16 @@ const handleRequest = async (request, response) => {
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
       }
-      if (user.role === "admin") {
-        const modifyUser = await User.findById(url.split("/")[3]).exec();
-        switch (method.toUpperCase()) {
-          case "GET":
-            return responseUtils.sendJson(response, user);
-          case "PUT": {
-            const data = await parseBodyJson(request);
-            if (!data.role) {
-              return responseUtils.badRequest(response, "Missing role!");
-            }
-            if (data.role !== "admin" && data.role !== "customer") {
-              return responseUtils.badRequest(response, "Unknown role!");
-            }
-
-            modifyUser.role = data.role;
-            const updatedUser = await modifyUser.save();
-
-            return responseUtils.sendJson(response, updatedUser);
-          }
-          case "DELETE":
-            if (!modifyUser) {
-              return responseUtils.notFound(response);
-            }
-            await User.deleteOne({ _id: url.split("/")[3] });
-            return responseUtils.sendJson(response, modifyUser);
+      const desiredId = url.split("/")[3]
+      switch (method.toUpperCase()) {
+        case "GET":
+          return viewUser(response, desiredId, user);
+        case "PUT": {
+          const data = await parseBodyJson(request);
+          return updateUser(response, desiredId, user, data);
         }
-      } else if (user.role === "customer") {
-        return responseUtils.forbidden(response);
-      } else {
-        return responseUtils.notFound(response);
+        case "DELETE":
+          return deleteUser(response, desiredId, user);
       }
     } else {
       return responseUtils.basicAuthChallenge(response);
@@ -145,8 +126,7 @@ const handleRequest = async (request, response) => {
         return responseUtils.basicAuthChallenge(response);
       }
       if (user.role === "admin") {
-        const allUser = await User.find({});
-        return responseUtils.sendJson(response, allUser);
+        return getAllUsers(response);
       }
       if (user.role === "customer") {
         return responseUtils.forbidden(response);
@@ -179,16 +159,17 @@ const handleRequest = async (request, response) => {
     // TODO: 8.3 Implement registration
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
     const payload = await parseBodyJson(request);
-    const validateMsg = validateUser(payload);
-    const userInuse = await User.findOne({ email: payload.email });
-    if ( validateMsg.length > 0 || userInuse) {
-      payload["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
-      return responseUtils.badRequest(response, payload["error"]);
-    } else {
-      const newUser = new User({ ...payload, role: "customer" });
-      const savedUser = await newUser.save();
-      return responseUtils.createdResource(response, savedUser);
-    }
+    // const validateMsg = validateUser(payload);
+    // const userInuse = await User.findOne({ email: payload.email });
+    // if ( validateMsg.length > 0 || userInuse) {
+    //   payload["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
+    //   return responseUtils.badRequest(response, payload["error"]);
+    // } else {
+    //   const newUser = new User({ ...payload, role: "customer" });
+    //   const savedUser = await newUser.save();
+    //   return responseUtils.createdResource(response, savedUser);
+    // }
+    return registerUser(response, payload);
   }
 };
 module.exports = { handleRequest };
