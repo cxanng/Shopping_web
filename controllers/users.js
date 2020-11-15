@@ -27,6 +27,9 @@ const deleteUser = async (response, userId, currentUser) => {
   if (currentUser.id === userId) {
     return responseUtils.badRequest(response, "Cannot delete yourself!");
   }
+  if (currentUser.role === "customer") {
+    return responseUtils.forbidden(response);
+  }
   const modifyUser = await User.findById(userId).exec();
   if (!modifyUser) {
     return responseUtils.notFound(response);
@@ -48,6 +51,9 @@ const updateUser = async (response, userId, currentUser, userData) => {
   // throw new Error('Not Implemented');
   if (userId === currentUser.id) {
     return responseUtils.badRequest(response, "Updating own data is not allowed");
+  }
+  if (currentUser.role === "customer") {
+    return responseUtils.forbidden(response);
   }
   const updatedUser = await User.findById(userId).exec();
   if (!updatedUser) {
