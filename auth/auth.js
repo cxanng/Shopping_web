@@ -15,6 +15,13 @@ const getCurrentUser = async request => {
   // logged in user
 
   // throw new Error('Not Implemented');
+  const authorization = request.headers["authorization"];
+  if (!authorization) {
+    return null;
+  }
+  if (!authorization.startsWith("Basic")) {
+    return null;
+  }
   const data = getCredentials(request);
   const user = await User
     .findOne({ email: data[0] })
