@@ -1,3 +1,6 @@
+const User = require("../models/user");
+const responseUtils = require("../utils/responseUtils");
+
 /**
  * Send all users as JSON
  *
@@ -5,7 +8,10 @@
  */
 const getAllUsers = async response => {
   // TODO: 10.1 Implement this
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+
+  const allUser = await User.find();
+  return responseUtils.sendJson(response, allUser);
 };
 
 /**
@@ -17,7 +23,16 @@ const getAllUsers = async response => {
  */
 const deleteUser = async (response, userId, currentUser) => {
   // TODO: 10.1 Implement this
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  if (currentUser.id === userId) {
+    return responseUtils.badRequest(response, "Cannot delete yourself!");
+  }
+  const modifyUser = await User.findById(userId).exec();
+  if (!modifyUser) {
+    return responseUtils.notFound(response);
+  }
+  await User.deleteOne({ _id: userId });
+  return responseUtils.sendJson(response, modifyUser);
 };
 
 /**
@@ -30,7 +45,24 @@ const deleteUser = async (response, userId, currentUser) => {
  */
 const updateUser = async (response, userId, currentUser, userData) => {
   // TODO: 10.1 Implement this
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  if (userId === currentUser.id) {
+    return responseUtils.badRequest(response, "Updating own data is not allowed");
+  }
+  const updatedUser = await User.findById(userId).exec();
+  if (!updatedUser) {
+    return responseUtils.notFound(response);
+  }
+  if (!userData.role) {
+    return responseUtils.badRequest(response, "Missing role!");
+  }
+  if (userData.role !== "admin" && userData.role !== "customer") {
+    return responseUtils.badRequest(response, "Unknown role!");
+  }
+  updatedUser.role = userData.role;
+  const modifiedUser = await updatedUser.save();
+  return responseUtils.sendJson(response, modifiedUser);
+
 };
 
 /**
@@ -42,7 +74,15 @@ const updateUser = async (response, userId, currentUser, userData) => {
  */
 const viewUser = async (response, userId, currentUser) => {
   // TODO: 10.1 Implement this
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  if (currentUser.role === "customer") {
+    return responseUtils.forbidden(response);
+  }
+  const viewedUser = await User.findById(userId).exec();
+  if (!viewedUser) {
+    return responseUtils.notFound(response);
+  }
+  return responseUtils.sendJson(response, viewedUser);
 };
 
 /**
@@ -53,7 +93,30 @@ const viewUser = async (response, userId, currentUser) => {
  */
 const registerUser = async (response, userData) => {
   // TODO: 10.1 Implement this
-  throw new Error('Not Implemented');
+  // throw new Error('Not Implemented');
+  const error = [];
+  ["email", "password", "name"].forEach(element => {
+    if (!userData[element]) {
+      error.push(`${element} is missing!`);
+    }
+  });
+  if (error.length !== 0) {
+    return responseUtils.badRequest(response, error[0]);
+  }
+  if (!userData["email"].includes("@")) {
+    return responseUtils.badRequest(response, "Email is invalid");
+  }
+  if (userData["password"].length < 10) {
+    return responseUtils.badRequest(response, "Password is too short");
+  }
+  const userInuse = await User.findOne({ email: userData.email });
+  if (userInuse) {
+    return responseUtils.badRequest(response, "Email in use");
+  } else {
+    const newUser = new User({ ...userData, role: "customer" });
+    const savedUser = await newUser.save();
+    return responseUtils.createdResource(response, savedUser);
+  }
 };
 
 module.exports = { getAllUsers, registerUser, deleteUser, viewUser, updateUser };
