@@ -57,7 +57,7 @@ const generateId = () => {
 const emailInUse = email => {
   // TODO: 8.3 Check if there already exists a user with a given email
   // throw new Error('Not Implemented');
-  return data.users.some((element) => element.email === email);
+  return data.users.some(element => element.email === email);
 };
 
 /**
@@ -73,8 +73,9 @@ const emailInUse = email => {
 const getUser = (email, password) => {
   // TODO: 8.3 Get user whose email and password match the provided values
 
-  const user = data.users.find(element =>
-    element.email === email && element.password === password);
+  const user = data.users.find(
+    element => element.email === email && element.password === password
+  );
   if (!user) {
     return user;
   }
@@ -175,7 +176,9 @@ const updateUserRole = (userId, role) => {
     return undefined;
   }
   updatedUser = { ...updatedUser, role };
-  data.users = data.users.map(user => user._id !== userId ? user : updatedUser);
+  data.users = data.users.map(user =>
+    user._id !== userId ? user : updatedUser
+  );
   return updatedUser;
 };
 
