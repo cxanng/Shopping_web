@@ -50,7 +50,10 @@ const updateUser = async (response, userId, currentUser, userData) => {
   // TODO: 10.1 Implement this
   // throw new Error('Not Implemented');
   if (userId === currentUser.id) {
-    return responseUtils.badRequest(response, "Updating own data is not allowed");
+    return responseUtils.badRequest(
+      response,
+      "Updating own data is not allowed"
+    );
   }
   if (currentUser.role === "customer") {
     return responseUtils.forbidden(response);
@@ -68,7 +71,6 @@ const updateUser = async (response, userId, currentUser, userData) => {
   updatedUser.role = userData.role;
   const modifiedUser = await updatedUser.save();
   return responseUtils.sendJson(response, modifiedUser);
-
 };
 
 /**
@@ -125,4 +127,10 @@ const registerUser = async (response, userData) => {
   }
 };
 
-module.exports = { getAllUsers, registerUser, deleteUser, viewUser, updateUser };
+module.exports = {
+  getAllUsers,
+  registerUser,
+  deleteUser,
+  viewUser,
+  updateUser
+};

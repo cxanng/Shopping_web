@@ -23,12 +23,9 @@ const getCurrentUser = async request => {
     return null;
   }
   const data = getCredentials(request);
-  const user = await User
-    .findOne({ email: data[0] })
-    .exec();
-  const passwordCorrect = user === null
-    ? false
-    : await user.checkPassword(data[1]);
+  const user = await User.findOne({ email: data[0] }).exec();
+  const passwordCorrect =
+    user === null ? false : await user.checkPassword(data[1]);
   if (!passwordCorrect) {
     return null;
   }

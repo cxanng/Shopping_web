@@ -1,11 +1,15 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { validateUser } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
 const { getAllProducts } = require("./utils/products.js");
-const User = require("./models/user");
-const { registerUser, getAllUsers, updateUser, viewUser, deleteUser } = require("./controllers/users");
+const {
+  registerUser,
+  getAllUsers,
+  updateUser,
+  viewUser,
+  deleteUser
+} = require("./controllers/users");
 
 /**
  * Known API routes and their allowed methods
@@ -69,7 +73,8 @@ const handleRequest = async (request, response) => {
 
   // serve static files from public/ and return immediately
   if (method.toUpperCase() === "GET" && !filePath.startsWith("/api")) {
-    const fileName = filePath === "/" || filePath === "" ? "index.html" : filePath;
+    const fileName =
+      filePath === "/" || filePath === "" ? "index.html" : filePath;
     return renderPublic(fileName, response);
   }
 
@@ -83,7 +88,7 @@ const handleRequest = async (request, response) => {
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
       }
-      const desiredId = url.split("/")[3]
+      const desiredId = url.split("/")[3];
       switch (method.toUpperCase()) {
         case "GET":
           return viewUser(response, desiredId, user);
@@ -103,7 +108,8 @@ const handleRequest = async (request, response) => {
   if (!(filePath in allowedMethods)) return responseUtils.notFound(response);
 
   // See: http://restcookbook.com/HTTP%20Methods/options/
-  if (method.toUpperCase() === "OPTIONS") return sendOptions(filePath, response);
+  if (method.toUpperCase() === "OPTIONS")
+    return sendOptions(filePath, response);
 
   // Check for allowable methods
   if (!allowedMethods[filePath].includes(method.toUpperCase())) {
@@ -153,22 +159,15 @@ const handleRequest = async (request, response) => {
   if (filePath === "/api/register" && method.toUpperCase() === "POST") {
     // Fail if not a JSON request
     if (!isJson(request)) {
-      return responseUtils.badRequest(response, "Invalid Content-Type. Expected application/json");
+      return responseUtils.badRequest(
+        response,
+        "Invalid Content-Type. Expected application/json"
+      );
     }
 
     // TODO: 8.3 Implement registration
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
     const payload = await parseBodyJson(request);
-    // const validateMsg = validateUser(payload);
-    // const userInuse = await User.findOne({ email: payload.email });
-    // if ( validateMsg.length > 0 || userInuse) {
-    //   payload["error"] = validateMsg > 0 ? validateMsg : ["Email in use"];
-    //   return responseUtils.badRequest(response, payload["error"]);
-    // } else {
-    //   const newUser = new User({ ...payload, role: "customer" });
-    //   const savedUser = await newUser.save();
-    //   return responseUtils.createdResource(response, savedUser);
-    // }
     return registerUser(response, payload);
   }
 };

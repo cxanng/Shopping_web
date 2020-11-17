@@ -17,10 +17,10 @@ const getAllProducts = () => products.map(product => ({ ...product }));
  * @param {string} productId
  * @returns {Object/undefined}
  */
-const getProductById = (productId) => {
+const getProductById = productId => {
   const product = products.find(element => element._id === productId);
   if (!product) {
-      return undefined;
+    return undefined;
   }
   return { ...product };
 };
