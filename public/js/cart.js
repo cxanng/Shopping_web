@@ -5,16 +5,10 @@ const URL = "http://localhost:3000/api/products";
 
 const getAllProductsFromCart = async () => {
   const products = await getJSON(URL);
-  const cart = [];
-  for (let i = 0; i < sessionStorage.length; i++) {
-    const key = sessionStorage.key(i);
-    const product = {
-      item : products.find(element => element._id === key),
-      count : parseInt(sessionStorage.getItem(key))
-    };
-    cart.push(product);
-  }
-  return cart;
+  return cart = Object.keys(sessionStorage).map(key => ({
+    item: products.find(element => element._id === key),
+    count: parseInt(sessionStorage.getItem(key))
+  }));
 };
 
 const renderCart = async () => {
