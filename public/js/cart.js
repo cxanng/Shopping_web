@@ -5,7 +5,7 @@ const URL = "http://localhost:3000/api/products";
 
 const getAllProductsFromCart = async () => {
   const products = await getJSON(URL);
-  return cart = Object.keys(sessionStorage).map(key => ({
+  return Object.keys(sessionStorage).map(key => ({
     item: products.find(element => element._id === key),
     count: parseInt(sessionStorage.getItem(key))
   }));
