@@ -9,7 +9,7 @@ const responseUtils = require("../utils/responseUtils");
 const getAllProducts = async response => {
   // TODO: 10.1 Implement this
   // throw new Error('Not Implemented');
-  const products = await Product.find();
+  const products = await Product.find({});
   return responseUtils.sendJson(response, products);
 };
 
@@ -36,11 +36,7 @@ const addProduct = async (response, currentUser, productData) => {
   const newProduct = new Product({ ...productData });
   const savedUser = await newProduct.save();
   return responseUtils.createdResource(response, savedUser);
-<<<<<<< Updated upstream
 };
-=======
-}
->>>>>>> Stashed changes
 
 /**
  * Get a single product's information as JSON
@@ -79,7 +75,6 @@ const updateProduct = async (response, productId, currentUser, productData) => {
   return responseUtils.sendJson(response, modifiedProduct);
 };
 
-<<<<<<< Updated upstream
 /**
  * Delete a product and send deleted product as JSON
  *
@@ -106,6 +101,3 @@ module.exports = {
   viewProduct,
   deleteProduct
 };
-=======
-module.exports = { getAllProducts, addProduct, updateProduct, viewProduct };
->>>>>>> Stashed changes
