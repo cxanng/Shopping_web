@@ -19,9 +19,10 @@ const {
  */
 const allowedMethods = {
   "/api/register": ["POST"],
-  "/api/users": ["GET", "POST", "PUT", "DELETE"],
-  "api/products": ["POST", "GET", "PUT", "DELETE"],
-  "/api/cart": ["GET"]
+  "/api/users": ["GET"],
+  "/api/products": ["POST", "GET"],
+  // "/api/cart": ["GET"],
+  "/api/orders": ["GET", "POST"]
 };
 
 /**
