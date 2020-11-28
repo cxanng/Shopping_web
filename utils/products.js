@@ -7,15 +7,15 @@ const products = require("../products.json").map(product => ({ ...product }));
 /**
  * Return all products
  *
- * @returns {Array<Object>} all products
+ * @returns {Array<object>} all products
  */
 const getAllProducts = () => products.map(product => ({ ...product }));
 
 /**
  * Return product object with matching ID or undefined if not found.
  *
- * @param {string} productId
- * @returns {Object/undefined}
+ * @param {string} productId id of the product
+ * @returns {object/undefined} product with given id or undefined
  */
 const getProductById = productId => {
   const product = products.find(element => element._id === productId);

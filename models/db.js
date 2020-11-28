@@ -18,6 +18,9 @@ const getDbUrl = () => {
   return "mongodb://localhost:27017/WebShopDb";
 };
 
+/**
+ * Establish connection to database
+ */
 function connectDB() {
   // Do nothing if already connected
   if (!mongoose.connection || mongoose.connection.readyState === 0) {
@@ -40,11 +43,19 @@ function connectDB() {
   }
 }
 
+/**
+ * Handle critical error during connection to database
+ *
+ * @param {any} err error object
+ */
 function handleCriticalError(err) {
   console.error(err);
   throw err;
 }
 
+/**
+ * Disconnect from database
+ */
 function disconnectDB() {
   mongoose.disconnect();
 }

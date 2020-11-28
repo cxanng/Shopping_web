@@ -4,7 +4,7 @@ const responseUtils = require("../utils/responseUtils");
 /**
  * Send all products as JSON
  *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response response object
  */
 const getAllProducts = async response => {
   // TODO: 10.1 Implement this
@@ -16,9 +16,9 @@ const getAllProducts = async response => {
 /**
  * Add a new product
  *
- * @param {http.ServerResponse} response
- * @param {Object} currentUser
- * @param {Object} productData
+ * @param {http.ServerResponse} response response object
+ * @param {object} currentUser object represent current logged in user
+ * @param {object} productData object represent data of to be added product
  */
 const addProduct = async (response, currentUser, productData) => {
   if (currentUser.role === "customer") {
@@ -44,8 +44,8 @@ const addProduct = async (response, currentUser, productData) => {
 /**
  * Get a single product's information as JSON
  *
- * @param {http.ServerResponse} response
- * @param {string} productId
+ * @param {http.ServerResponse} response response object
+ * @param {string} productId id of product
  */
 const viewProduct = async (response, productId) => {
   const viewedProduct = await Product.findById(productId).exec();
@@ -58,10 +58,10 @@ const viewProduct = async (response, productId) => {
 /**
  * Update product and sane updated product as JSON
  *
- * @param {http.ServerResponse} response
- * @param {string} productId
- * @param {Object} currentUser
- * @param {Object} productData
+ * @param {http.ServerResponse} response response object
+ * @param {string} productId id of the product to be updated
+ * @param {object} currentUser object represent current logged in user
+ * @param {object} productData object represent data of update product
  */
 const updateProduct = async (response, productId, currentUser, productData) => {
   if (currentUser.role !== "admin") {
@@ -91,9 +91,9 @@ const updateProduct = async (response, productId, currentUser, productData) => {
 /**
  * Delete a product and send deleted product as JSON
  *
- * @param {http.ServerResponse} response
- * @param {string} productId
- * @param {Object} currentUser
+ * @param {http.ServerResponse} response response object
+ * @param {string} productId id of the product will be deleted
+ * @param {object} currentUser object represent current logged in user
  */
 const deleteProduct = async (response, productId, currentUser) => {
   if (currentUser.role !== "admin") {
