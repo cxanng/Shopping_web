@@ -9,7 +9,7 @@ const responseUtils = require("../utils/responseUtils");
 const getAllProducts = async response => {
   // TODO: 10.1 Implement this
   // throw new Error('Not Implemented');
-  const products = await Product.find({});
+  const products = await Product.find();
   return responseUtils.sendJson(response, products);
 };
 
@@ -69,6 +69,16 @@ const updateProduct = async (response, productId, currentUser, productData) => {
     return responseUtils.notFound(response);
   }
   Object.keys(productData).forEach(element => {
+    if (element === "name" && productData[element] === "") {
+      return responseUtils.badRequest(response, "Name must not be empty");
+    } else if (
+      element === "price" &&
+      typeof productData[element] !== "number"
+    ) {
+      return responseUtils.badRequest(response, "Price must be a number");
+    } else if (element === "price" && productData[element] <= 0) {
+      return responseUtils.badRequest(response, "Price must be positive");
+    }
     updatedProduct[element] = productData[element];
   });
   const modifiedProduct = await updatedProduct.save();

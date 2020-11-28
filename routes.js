@@ -2,7 +2,13 @@ const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
 const { getCurrentUser } = require("./auth/auth");
-const { getAllProducts } = require("./utils/products.js");
+const {
+  getAllProducts,
+  addProduct,
+  viewProduct,
+  updateProduct,
+  deleteProduct
+} = require("./controllers/products.js");
 const {
   registerUser,
   getAllUsers,
@@ -68,6 +74,16 @@ const matchUserId = url => {
   return matchIdRoute(url, "users");
 };
 
+/**
+ * Does the URL match /api/products/{id}
+ *
+ * @param {string} url filePath
+ * @returns {boolean}
+ */
+const matchProductId = url => {
+  return matchIdRoute(url, "products");
+};
+
 const handleRequest = async (request, response) => {
   const { url, method, headers } = request;
   const filePath = new URL(url, `http://${headers.host}`).pathname;
@@ -84,7 +100,8 @@ const handleRequest = async (request, response) => {
     // You can use parseBodyJson(request) from utils/requestUtils.js to parse request body
     // throw new Error("Not Implemented");
     const authorize = request.headers["authorization"];
-    if (authorize) {
+    const acceptable = acceptsJson(request);
+    if (authorize && acceptable) {
       const user = await getCurrentUser(request);
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
@@ -100,8 +117,36 @@ const handleRequest = async (request, response) => {
         case "DELETE":
           return deleteUser(response, desiredId, user);
       }
-    } else {
+    } else if (!authorize) {
       return responseUtils.basicAuthChallenge(response);
+    } else if (!acceptable) {
+      return responseUtils.contentTypeNotAcceptable(response);
+    }
+  }
+
+  if (matchProductId(filePath)) {
+    const authorize = request.headers["authorization"];
+    const acceptable = acceptsJson(request);
+    if (authorize && acceptable) {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
+      }
+      const desiredId = url.split("/")[3];
+      switch (method.toUpperCase()) {
+        case "GET":
+          return viewProduct(response, desiredId);
+        case "PUT": {
+          const data = await parseBodyJson(request);
+          return updateProduct(response, desiredId, user, data);
+        }
+        case "DELETE":
+          return deleteProduct(response, desiredId, user);
+      }
+    } else if (!authorize) {
+      return responseUtils.basicAuthChallenge(response);
+    } else if (!acceptable) {
+      return responseUtils.contentTypeNotAcceptable(response);
     }
   }
 
@@ -143,7 +188,7 @@ const handleRequest = async (request, response) => {
     }
   }
 
-  //
+  // get all products
   if (filePath === "/api/products" && method.toUpperCase() === "GET") {
     const authorize = request.headers["authorization"];
     if (authorize) {
@@ -151,9 +196,34 @@ const handleRequest = async (request, response) => {
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
       }
-      return responseUtils.sendJson(response, getAllProducts());
+      return getAllProducts(response);
     }
     return responseUtils.basicAuthChallenge(response);
+  }
+
+  // add new product
+  if (filePath === "/api/products" && method.toUpperCase() === "POST") {
+    // Fail if not a JSON request
+    if (!isJson(request)) {
+      return responseUtils.badRequest(
+        response,
+        "Invalid Content-Type. Expected application/json"
+      );
+    }
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
+      }
+      if (user.role === "customer") {
+        return responseUtils.forbidden(response);
+      }
+      const payload = await parseBodyJson(request);
+      return addProduct(response, user, payload);
+    } else {
+      return responseUtils.basicAuthChallenge(response);
+    }
   }
 
   // register new user
