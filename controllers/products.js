@@ -21,6 +21,9 @@ const getAllProducts = async response => {
  * @param {Object} productData
  */
 const addProduct = async (response, currentUser, productData) => {
+  if (currentUser.role === "customer") {
+    return responseUtils.forbidden(response);
+  }
   const error = [];
   ["price", "name"].forEach(element => {
     if (!productData[element]) {

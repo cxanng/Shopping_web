@@ -13,10 +13,10 @@ const getAllOrders = async (response, currentUser) => {
   if (currentUser.role === "customer") {
     return responseUtils.sendJson(
       response,
-      Order.find({ customerId: currentUser.id })
+      await Order.find({ customerId: currentUser.id })
     );
   }
-  return responseUtils.sendJson(response, Order.find());
+  return responseUtils.sendJson(response, await Order.find());
 };
 
 /**
@@ -28,9 +28,12 @@ const getAllOrders = async (response, currentUser) => {
  * @param {Object} currentUser
  */
 const viewOrder = async (response, orderId, currentUser) => {
-  const viewedOrder = Order.findById(orderId).exec();
+  const viewedOrder = await Order.findById(orderId).exec();
+  if (!viewedOrder) {
+    return responseUtils.notFound(response);
+  }
   if (currentUser.role === "customer") {
-    if (viewedOrder.customerId === currentUser.id) {
+    if (viewedOrder.customerId.toString() === currentUser.id) {
       return responseUtils.sendJson(response, viewedOrder);
     }
     return responseUtils.notFound(response);
@@ -45,8 +48,14 @@ const viewOrder = async (response, orderId, currentUser) => {
  * @param {Object} orderData
  * @param {Object} currentUser
  */
-const addOrder = async (response, orderData, currentUser) => {
+const addOrder = async (response, currentUser, orderData) => {
+  if (currentUser.role === "admin") {
+    return responseUtils.forbidden(response);
+  }
   const error = [];
+  if (orderData.items.length === 0) {
+    return responseUtils.badRequest(response, "order must contain items");
+  }
   orderData.items.forEach(item => {
     if (!item.quantity) {
       error.push("Quantity is missing!");

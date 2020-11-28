@@ -9,7 +9,6 @@ const responseUtils = require("../utils/responseUtils");
 const getAllUsers = async response => {
   // TODO: 10.1 Implement this
   // throw new Error('Not Implemented');
-
   const allUser = await User.find();
   return responseUtils.sendJson(response, allUser);
 };

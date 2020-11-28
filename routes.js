@@ -17,6 +17,8 @@ const {
   deleteUser
 } = require("./controllers/users");
 
+const { getAllOrders, viewOrder, addOrder } = require("./controllers/orders");
+
 /**
  * Known API routes and their allowed methods
  *
@@ -82,6 +84,16 @@ const matchUserId = url => {
  */
 const matchProductId = url => {
   return matchIdRoute(url, "products");
+};
+
+/**
+ * Does the URL match /api/products/{id}
+ *
+ * @param {string} url filePath
+ * @returns {boolean}
+ */
+const matchOrderId = url => {
+  return matchIdRoute(url, "orders");
 };
 
 const handleRequest = async (request, response) => {
@@ -150,6 +162,23 @@ const handleRequest = async (request, response) => {
     }
   }
 
+  if (matchOrderId(filePath)) {
+    const authorize = request.headers["authorization"];
+    const acceptable = acceptsJson(request);
+    if (authorize && acceptable) {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
+      }
+      const desiredId = url.split("/")[3];
+      return viewOrder(response, desiredId, user);
+    } else if (!authorize) {
+      return responseUtils.basicAuthChallenge(response);
+    } else if (!acceptable) {
+      return responseUtils.contentTypeNotAcceptable(response);
+    }
+  }
+
   // Default to 404 Not Found if unknown url
   if (!(filePath in allowedMethods)) return responseUtils.notFound(response);
 
@@ -177,12 +206,10 @@ const handleRequest = async (request, response) => {
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
       }
-      if (user.role === "admin") {
-        return getAllUsers(response);
-      }
       if (user.role === "customer") {
         return responseUtils.forbidden(response);
       }
+      return getAllUsers(response);
     } else {
       return responseUtils.basicAuthChallenge(response);
     }
@@ -197,6 +224,19 @@ const handleRequest = async (request, response) => {
         return responseUtils.basicAuthChallenge(response);
       }
       return getAllProducts(response);
+    }
+    return responseUtils.basicAuthChallenge(response);
+  }
+
+  // get all orders
+  if (filePath === "/api/orders" && method.toUpperCase() === "GET") {
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
+      }
+      return getAllOrders(response, user);
     }
     return responseUtils.basicAuthChallenge(response);
   }
@@ -216,11 +256,29 @@ const handleRequest = async (request, response) => {
       if (!user) {
         return responseUtils.basicAuthChallenge(response);
       }
-      if (user.role === "customer") {
-        return responseUtils.forbidden(response);
-      }
       const payload = await parseBodyJson(request);
       return addProduct(response, user, payload);
+    } else {
+      return responseUtils.basicAuthChallenge(response);
+    }
+  }
+
+  // place new order
+  if (filePath === "/api/orders" && method.toUpperCase() === "POST") {
+    if (!isJson(request)) {
+      return responseUtils.badRequest(
+        response,
+        "Invalid Content-Type. Expected application/json"
+      );
+    }
+    const authorize = request.headers["authorization"];
+    if (authorize) {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return responseUtils.basicAuthChallenge(response);
+      }
+      const payload = await parseBodyJson(request);
+      return addOrder(response, user, payload);
     } else {
       return responseUtils.basicAuthChallenge(response);
     }
