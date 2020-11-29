@@ -60,17 +60,29 @@ const decreaseProduct = (id) => {
   }
 }
 
+const placeNewOrder = async () => {
+  const items = Object.keys(sessionStorage);
+  const allProducts = await getJSON("/api/products");
+  const orderedItems = items.map(id => new { 
+    product: allProducts.find(x => x.id === id),
+    quantity: parseInt(sessionStorage.getItem(id))
+  });
+  if (orderedItems.length !== 0) {
+    const order = { items: orderedItems }
+    postOrPutJSON("/api/orders", "POST", order);
+  }
+}
+
 document.getElementById("place-order-button").addEventListener(
   "click",
-  () => {
-    createNotification(
-      "Succesfully created an order!",
-      "notifications-container",
-      true
-    );
+  async (e) => {
+    e.preventDefault();
+    placeNewOrder()
     clearCart();
     document.getElementById("cart-container").innerHTML = "";
-  }
+    createNotification("Order placed", "notifications-container", true);
+
+  }  
 );
 
 renderCart();
