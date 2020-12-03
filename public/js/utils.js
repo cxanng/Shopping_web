@@ -180,3 +180,19 @@ const getProductCountFromCart = id =>
 const clearCart = () => {
   sessionStorage.clear();
 };
+
+function Item(id, allProducts) {
+  this.product = allProducts.find(x => x._id === id);
+  this.quantity = parseInt(sessionStorage.getItem(id));
+}
+
+
+const placeNewOrder = async () => {
+  const items = Object.keys(sessionStorage);
+  const allProducts = await getJSON("/api/products");
+  const orderedItems = items.map(id => new Item(id, allProducts));
+  if (orderedItems.length !== 0) {
+    const order = { items: orderedItems }
+    postOrPutJSON("/api/orders", "POST", order);
+  }
+}
