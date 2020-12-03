@@ -24,7 +24,10 @@
     <main>
       <h1>Products</h1>
       <div id="notifications-container"></div>
+      <div id="modify-product"></div>
       <div id="products-container"></div>
+      <button id="sort-by-name-button">Sort products by name</button>
+      <button id="sort-by-price-button">Sort products by price</button>
     </main>
     <footer>
       <p>Copyright &copy; 2020 diipadaa etc etc.</p>
@@ -34,8 +37,75 @@
         <h3 class="product-name"></h3>
         <p class="product-description"></p>
         <p class="product-price"></p>
-        <button>Add to cart</button>
+        <button class="add-to-cart-button">Add to cart</button>
+        <button class="modify-product-button">Modify product</button>
+        <button class="delete-product-button">Delete product</button>
       </div>
+    </template>
+    <template id="form-template">
+      <form method="POST" id='edit-product-form'>
+        <h2 class="text-align-center">Modify product {Product Name}</h2>
+        <div class="form-group">
+          <label for="id">Id</label>
+          <input 
+            name="_id" 
+            type="text" 
+            class="form-control"
+            id="id-input" 
+            value="" 
+            required 
+            disabled>
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input 
+            name="name" 
+            type="text" 
+            class="form-control"
+            id="name-input" 
+            value="" 
+            required 
+            disabled>
+        </div>
+        <div class="form-group">
+          <label for="image">Image</label>
+          <input 
+            name="image" 
+            type="url" 
+            class="form-control"
+            id="image-input" 
+            value="" 
+            required 
+            disabled>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input 
+            name="description" 
+            type="text" 
+            class="form-control"
+            id="description-input" 
+            value="" 
+            required 
+            disabled>
+        </div>
+        <div class="form-group">
+          <label for="price">Price</label>
+          <input 
+            name="price" 
+            type="text" 
+            class="form-control"
+            id="price-input" 
+            value="" 
+            required 
+            disabled>
+        </div>
+        <div class="form-group">
+          <div class="second-column">
+            <button type="submit" id="update-button">Update</button>
+          </div>
+        </div>
+      </form>
     </template>
     <script src="js/utils.js"></script>
     <script src="js/products.js"></script>
