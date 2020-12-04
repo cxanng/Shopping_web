@@ -114,4 +114,23 @@ const modifyHandle = async (id) => {
         }
     })
 }
+
+document.getElementById("sort-by-name-button").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const products = await getJSON(URL);
+    const nameSortedProduct = products.sort((a, b) => (a.name > b.name) ? 1 : -1)
+    container.innerHTML = "";
+    renderProduct(nameSortedProduct);
+    console.log("success")
+})
+
+document.getElementById("sort-by-price-button").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const products = await getJSON(URL);
+    const nameSortedProduct = products.sort((a, b) => (a.price > b.price) ? 1 : -1)
+    container.innerHTML = "";
+    renderProduct(nameSortedProduct);
+    console.log("success")
+})
+
 productLoad();
