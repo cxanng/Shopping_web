@@ -11,7 +11,7 @@ const renderOrder = orders => {
 
         const orderRow = orderNode.querySelector("div");
         orderRow.setAttribute("id", `order-${orderId}`);
-
+        let total = 0.0;
         order.items.forEach(orderedItem => {
             const productId = orderedItem._id;
             const itemNode = itemTemplate.content.cloneNode(true);
@@ -21,23 +21,27 @@ const renderOrder = orders => {
 
             const name = itemRow.querySelector(".product-name");
             name.setAttribute("id", `name-${productId}`);
-            name.innerText = orderedItem.product.name;
+            name.innerText = `Name: ${orderedItem.product.name}`;
 
             const description = itemRow.querySelector(".product-description");
             description.setAttribute("id", `description-${productId}`);
-            description.innerText = orderedItem.product.description;
+            description.innerText = `Description: ${orderedItem.product.description}`;
 
             const price = itemRow.querySelector(".product-price");
             price.setAttribute("id", `price-${productId}`);
-            price.innerText = orderedItem.product.price;
+            price.innerText = `Price: ${orderedItem.product.price}`;
 
             const amount = itemRow.querySelector(".product-amount");
             amount.setAttribute("id", `amount-${productId}`)
-            amount.innerText = orderedItem.quantity;
+            amount.innerText = `Quantity: ${orderedItem.quantity}`;
+
+            total = total + Number(orderedItem.product.price) * Number(orderedItem.quantity);
 
             orderRow.appendChild(itemRow);
         });
-        container.appendChild(orderRow);
+        orderNode.querySelector(".total-price").innerText = `Total price for order: ${total}`;
+        console.log(total);
+        container.appendChild(orderNode);
     });
 }
 
