@@ -13,7 +13,7 @@
       <nav class="navbar">
         <ul class="nav-links">
           <li><a href="index.html">Front Page</a></li>
-          <li><a href="register.html">Register</a></li>
+          <li>><a href="register.html">Register</a></li>
           <li><a href="users.html">List Users</a></li>
           <li><a href="products.html">List Products</a></li>
           <li><a href="cart.html">Shopping Cart</a></li>
@@ -25,9 +25,11 @@
       <h1>Products</h1>
       <div id="notifications-container"></div>
       <div id="modify-product"></div>
+      <button id="sort-by-name-button-increase">Increase by name</button>
+      <button id="sort-by-name-button-decrease">Decrease by name</button>
+      <button id="sort-by-price-button-increase">Increase by price</button>
+      <button id="sort-by-price-button-decrease">Decrease by price</button>
       <div id="products-container"></div>
-      <button id="sort-by-name-button">Sort products by name</button>
-      <button id="sort-by-price-button">Sort products by price</button>
     </main>
     <footer>
       <p>Copyright &copy; 2020 diipadaa etc etc.</p>
@@ -35,6 +37,7 @@
     <template id="product-template">
       <div class="item-row">
         <h3 class="product-name"></h3>
+        <img class="product-image"/>
         <p class="product-description"></p>
         <p class="product-price"></p>
         <button class="add-to-cart-button">Add to cart</button>

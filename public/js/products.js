@@ -15,6 +15,10 @@ const renderProduct = products => {
         name.setAttribute("id", `name-${id}`);
         name.innerText = product.name;
 
+        const image = itemRow.querySelector(".product-image");
+        image.setAttribute("id", `image-${id}`);
+        image.setAttribute("src", product.image);
+
         const description = itemRow.querySelector(".product-description");
         description.setAttribute("id", `description-${id}`);
         description.innerText = product.description;
@@ -51,8 +55,8 @@ const productLoad = async () => {
 }
 
 const deleteHandle = async (id) => {
-    const url = "api/products/" + id;
-    deleteResource(url).then(response => {
+    const url = `api/products/${id}`;
+    deleteResourse(url).then(response => {
         if(response) {
             createNotification("Deleted product "+ response.name, "notifications-container", true);
             container.querySelectorAll(`#product-${id}`).forEach(element => element.remove());
@@ -69,7 +73,7 @@ const modifyHandle = async (id) => {
 
     const cloneDiv = template.content.cloneNode(true);
 
-    const heading = cloneDiv.querySelector("h3")
+    const heading = cloneDiv.querySelector("h2")
     heading.innerHTML = `Modify product ${productInfo.name}`;
 
     const productId = cloneDiv.querySelector("#id-input");
@@ -116,22 +120,36 @@ const modifyHandle = async (id) => {
     })
 }
 
-document.getElementById("sort-by-name-button").addEventListener("click", async (e) => {
+document.getElementById("sort-by-name-button-increase").addEventListener("click", async (e) => {
     e.preventDefault();
     const products = await getJSON(URL);
-    const nameSortedProduct = products.sort((a, b) => (a.name > b.name) ? 1 : -1)
+    const nameSortedProduct = products.sort((a, b) => (a.name > b.name) ? 1 : -1);
     container.innerHTML = "";
     renderProduct(nameSortedProduct);
-    console.log("success")
 })
 
-document.getElementById("sort-by-price-button").addEventListener("click", async (e) => {
+document.getElementById("sort-by-name-button-decrease").addEventListener("click", async (e) => {
     e.preventDefault();
     const products = await getJSON(URL);
-    const nameSortedProduct = products.sort((a, b) => (a.price > b.price) ? 1 : -1)
+    const nameSortedProduct = products.sort((a, b) => (a.name < b.name) ? 1 : -1);
     container.innerHTML = "";
     renderProduct(nameSortedProduct);
-    console.log("success")
+})
+
+document.getElementById("sort-by-price-button-increase").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const products = await getJSON(URL);
+    const nameSortedProduct = products.sort((a, b) => (a.price > b.price) ? 1 : -1);
+    container.innerHTML = "";
+    renderProduct(nameSortedProduct);
+})
+
+document.getElementById("sort-by-price-button-decrease").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const products = await getJSON(URL);
+    const nameSortedProduct = products.sort((a, b) => (a.price < b.price) ? 1 : -1);
+    container.innerHTML = "";
+    renderProduct(nameSortedProduct);
 })
 
 productLoad();
