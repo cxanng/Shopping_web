@@ -117,3 +117,9 @@ button:hover {
 .background-red {
   background-color: red;
 }
+
+img {
+  max-width: 250;
+  height: auto;
+  border-radius: 10px;
+}
