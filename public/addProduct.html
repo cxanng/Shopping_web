@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/styles.css">
-    <title>Register</title>
+    <title>Add Product</title>
   </head>
 
   <body>
@@ -24,8 +24,8 @@
     </header>
     <main>
       <div id="notifications-container"></div>
-      <form id="register-form" class="form" method="POST">
-        <h2 class="text-align-center">Register</h2>
+      <form id="add-product-form" class="form" method="POST">
+        <h2 class="text-align-center">Add Product</h2>
         <div class="form-group">
           <label for="name">Name</label>
           <input
@@ -33,43 +33,42 @@
             name="name"
             class="form-control"
             id="name"
-            placeholder="John Doe"
+            placeholder="Fantastic chair"
             required>
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="description">Description</label>
           <input
-            type="email"
-            name="email"
+            type="text"
+            name="description"
             class="form-control"
-            id="email"
-            placeholder="user@example.com"
+            id="description"
+            placeholder="Cheap, beautiful chair"
             required>
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="price">Price</label>
           <input
-            type="password"
-            name="password"
+            type="text"
+            name="price"
             class="form-control"
-            id="password"
-            placeholder="password (at least 10 characters)"
+            id="price"
+            placeholder="20.0"
             required>
         </div>
         <div class="form-group">
-          <label for="passwordConfirmation">Password confirmation</label>
+          <label for="image">Image</label>
           <input
-            type="password"
-            name="passwordConfirmation"
+            type="url"
+            name="image"
             class="form-control"
-            id="passwordConfirmation"
-            placeholder="password confirmation"
-            minlength="1"
+            id="image"
+            placeholder="www.chair.com"
             required>
         </div>
         <div class="form-group">
           <div class="second-column">
-            <button type="submit" id="btnRegister">Register</button>
+            <button type="submit" id="btnAddProduct">Add Product</button>
           </div>
         </div>
       </form>
@@ -81,6 +80,6 @@
       <p>Copyright &copy; 2020</p>
     </footer>
     <script src="js/utils.js"></script>
-    <script src="js/register.js"></script>
+    <script src="js/addProduct.js"></script>
   </body>
 </html>
