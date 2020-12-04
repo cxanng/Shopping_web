@@ -44,6 +44,7 @@ const addProduct = ({ _id, name }) => {
     addProductToCart(_id);
     createNotification(`Added ${name} to cart!`, "notifications-container");
 }
+
 const productLoad = async () => {
     const products = await getJSON(URL);
     renderProduct(products);
