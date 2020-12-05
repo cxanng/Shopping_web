@@ -123,3 +123,17 @@ img {
   height: auto;
   border-radius: 10px;
 }
+
+.total-price {
+  font-size: 1.5em;
+  text-decoration: solid;
+  font-weight: 300;
+}
+
+.order-row {
+  background-color: lightcyan;
+  padding-left: 2;
+  margin: auto;
+  border-width: 1px;
+  border-style: solid;
+}
