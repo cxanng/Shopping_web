@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const { badRequest } = require("../utils/responseUtils");
 const responseUtils = require("../utils/responseUtils");
 
 /**
@@ -24,14 +25,14 @@ const addProduct = async (response, currentUser, productData) => {
   if (currentUser.role === "customer") {
     return responseUtils.forbidden(response);
   }
-  const error = [];
-  ["price", "name"].forEach(element => {
-    if (!productData[element]) {
-      error.push(`${element} is missing!`);
-    }
-  });
-  if (error.length !== 0) {
-    return responseUtils.badRequest(response, error[0]);
+  if (!productData.name) {
+    return responseUtils.badRequest(response, "Name is missing!");
+  }
+  if (!productData.price) {
+    return responseUtils.badRequest(response, "Price is missing!");
+  }
+  if (productData.price <= 0) {
+    return responseUtils.badRequest(response, "Price must be positive!");
   }
   if (currentUser.role !== "admin") {
     return responseUtils.forbidden(response);
