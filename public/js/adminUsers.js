@@ -38,7 +38,7 @@ const formTemplate = document.getElementById("form-template");
 const container = document.getElementById("users-container");
 const formContainer = document.getElementById("modify-user");
 
-const URL = "http://localhost:3000/api/users";
+const URL = `${getUrl()}/api/users`;
 
 const updatePersonInfo = ({ _id, role }) => {
   const roleText = document.getElementById(`role-${_id}`);

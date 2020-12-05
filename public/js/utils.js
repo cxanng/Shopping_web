@@ -198,3 +198,5 @@ const placeNewOrder = async () => {
     postOrPutJSON("/api/orders", "POST", order);
   }
 };
+
+const getUrl = () => window.location.origin;

@@ -2,7 +2,7 @@ const orderTemplate = document.getElementById("order-template");
 const itemTemplate = document.getElementById("order-item-template");
 const container = document.getElementById("orders-container");
 
-const URL = "http://localhost:3000/api/orders";
+const URL = `${getUrl()}/api/orders`;
 
 const renderOrder = orders => {
   orders.forEach(order => {

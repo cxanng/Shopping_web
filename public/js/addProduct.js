@@ -21,7 +21,6 @@ document.getElementById("btnAddProduct").addEventListener("click", e => {
       price: Number(price),
       image: image
     };
-    console.log(data);
-    postOrPutJSON("http://localhost:3000/api/products", "POST", data);
+    postOrPutJSON(`${getUrl()}/api/products`, "POST", data);
   }
 });

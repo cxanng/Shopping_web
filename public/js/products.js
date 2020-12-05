@@ -1,7 +1,7 @@
 const template = document.getElementById("product-template");
 const container = document.getElementById("products-container");
 
-const URL = "http://localhost:3000/api/products";
+const URL = `${getUrl()}/api/products`;
 
 const renderProduct = products => {
   products.forEach(product => {

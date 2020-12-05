@@ -30,6 +30,6 @@ document.getElementById("btnRegister").addEventListener("click", e => {
       true
     );
     const user = { name, email, password };
-    postOrPutJSON("http://localhost:3000/api/register", "POST", user);
+    postOrPutJSON(`${getUrl()}/api/register`, "POST", user);
   }
 });

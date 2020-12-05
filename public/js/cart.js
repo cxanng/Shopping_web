@@ -1,7 +1,7 @@
 const template = document.getElementById("cart-item-template");
 const container = document.getElementById("cart-container");
 
-const URL = "http://localhost:3000/api/products";
+const URL = `${getUrl()}/api/products`;
 
 const getAllProductsFromCart = async () => {
   const products = await getJSON(URL);
