@@ -19,7 +19,7 @@ const productSchema = new Schema({
   price: {
     type: Number,
     required: "Price is required",
-    validation: input => {
+    validate: input => {
       return input > 0;
     },
     description:
