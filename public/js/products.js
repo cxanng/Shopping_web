@@ -147,52 +147,49 @@ const modifyHandle = async id => {
 document
   .getElementById("sort-by-name-button-increase")
   .addEventListener("click", () => {
-    Array.from(tbody.querySelectorAll("tr:nth-child(n+1)"))
+    Array.from(container.querySelectorAll("div:nth-child(n+1)"))
       .sort((a, b) => {
-        const text1 = a.querySelectorAll("td")[col].innerText;
-        const text2 = b.querySelectorAll("td")[col].innerText;
+        const text1 = a.querySelector(".product-name").innerText;
+        const text2 = b.querySelector(".product-name").innerText;
         return text1.localeCompare(text2);
       })
-      .forEach(tr => tbody.appendChild(tr));
-    // const nameSortedProduct = products.sort((a, b) => (a.name > b.name) ? 1 : -1);
-    // container.innerHTML = "";
-    // renderProduct(nameSortedProduct);
+      .forEach(tr => container.appendChild(tr));
   });
 
 document
   .getElementById("sort-by-name-button-decrease")
-  .addEventListener("click", async e => {
-    e.preventDefault();
-    const products = await getJSON(URL);
-    const nameSortedProduct = products.sort((a, b) =>
-      a.name < b.name ? 1 : -1
-    );
-    container.innerHTML = "";
-    renderProduct(nameSortedProduct);
+  .addEventListener("click", () => {
+    Array.from(container.querySelectorAll("div:nth-child(n+1)"))
+      .sort((a, b) => {
+        const text1 = a.querySelector(".product-name").innerText;
+        const text2 = b.querySelector(".product-name").innerText;
+        return text2.localeCompare(text1);
+      })
+      .forEach(tr => container.appendChild(tr));
   });
 
 document
   .getElementById("sort-by-price-button-increase")
-  .addEventListener("click", async e => {
-    e.preventDefault();
-    const products = await getJSON(URL);
-    const nameSortedProduct = products.sort((a, b) =>
-      a.price > b.price ? 1 : -1
-    );
-    container.innerHTML = "";
-    renderProduct(nameSortedProduct);
+  .addEventListener("click", () => {
+    Array.from(container.querySelectorAll("div:nth-child(n+1)"))
+      .sort((a, b) => {
+        const text1 = a.querySelector(".product-price").innerText;
+        const text2 = b.querySelector(".product-price").innerText;
+        return text1.localeCompare(text2, undefined, { numeric: true });
+      })
+      .forEach(tr => container.appendChild(tr));
   });
 
 document
   .getElementById("sort-by-price-button-decrease")
-  .addEventListener("click", async e => {
-    e.preventDefault();
-    const products = await getJSON(URL);
-    const nameSortedProduct = products.sort((a, b) =>
-      a.price < b.price ? 1 : -1
-    );
-    container.innerHTML = "";
-    renderProduct(nameSortedProduct);
+  .addEventListener("click", () => {
+    Array.from(container.querySelectorAll("div:nth-child(n+1)"))
+      .sort((a, b) => {
+        const text1 = a.querySelector(".product-price").innerText;
+        const text2 = b.querySelector(".product-price").innerText;
+        return text2.localeCompare(text1, undefined, { numeric: true });
+      })
+      .forEach(tr => container.appendChild(tr));
   });
 
 productLoad();
