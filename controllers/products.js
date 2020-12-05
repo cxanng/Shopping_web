@@ -34,9 +34,6 @@ const addProduct = async (response, currentUser, productData) => {
   if (productData.price <= 0) {
     return responseUtils.badRequest(response, "Price must be positive!");
   }
-  if (currentUser.role !== "admin") {
-    return responseUtils.forbidden(response);
-  }
   const newProduct = new Product({ ...productData });
   const savedUser = await newProduct.save();
   return responseUtils.createdResource(response, savedUser);
@@ -72,17 +69,23 @@ const updateProduct = async (response, productId, currentUser, productData) => {
   if (!updatedProduct) {
     return responseUtils.notFound(response);
   }
+  const error = [];
   Object.keys(productData).forEach(element => {
     if (element === "name" && productData[element] === "") {
-      return responseUtils.badRequest(response, "Name must not be empty");
+      error.push("Name cannot be empty");
     } else if (
       element === "price" &&
       typeof productData[element] !== "number"
     ) {
-      return responseUtils.badRequest(response, "Price must be a number");
+      error.push("Price must be a number");
     } else if (element === "price" && productData[element] <= 0) {
-      return responseUtils.badRequest(response, "Price must be positive");
+      error.push("Price must be positive");
     }
+  });
+  if (error.length !== 0) {
+    return responseUtils.badRequest(response, error[0]);
+  }
+  Object.keys(productData).forEach(element => {
     updatedProduct[element] = productData[element];
   });
   const modifiedProduct = await updatedProduct.save();
