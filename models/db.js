@@ -11,11 +11,7 @@ const mongoose = require("mongoose");
 const getDbUrl = () => {
   // TODO: 9.3 Implement this
   // throw new Error("Implement this");
-  const dburl = process.env.DBURL;
-  if (dburl) {
-    return process.env.DBURL;
-  }
-  return "mongodb://localhost:27017/WebShopDb";
+  return process.env.MONGODB || "mongodb://localhost:27017/WebShopDb";
 };
 
 /**
