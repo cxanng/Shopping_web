@@ -1,5 +1,4 @@
 const Product = require("../models/product");
-const { badRequest } = require("../utils/responseUtils");
 const responseUtils = require("../utils/responseUtils");
 
 /**
