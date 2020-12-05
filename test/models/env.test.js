@@ -7,6 +7,6 @@ describe('.env', () => {
   it('must define DBURL', () => {
     expect(process.env).to.have.property('DBURL');
     expect(process.env.DBURL).to.be.a('string');
-    expect(process.env.DBURL).to.match(/^mongodb:\/\/.+/);
+    expect(process.env.DBURL).to.match(/^mongodb\+srv:\/\/.+/);
   });
 });
