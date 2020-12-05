@@ -15,7 +15,7 @@ document.getElementById("btnRegister").addEventListener("click", e => {
   const email = form.querySelector("#email").value;
   const password = form.querySelector("#password").value;
   const passwordConfirm = form.querySelector("#passwordConfirmation").value;
-  console.log(passwordConfirm)
+
   if (password !== passwordConfirm) {
     createNotification(
       "Password and password confirmation not match",

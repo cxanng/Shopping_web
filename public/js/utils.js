@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 /**
  * Asynchronously fetch JSON from the given url. (GET)
  *
@@ -43,8 +45,8 @@ const getJSON = async url => {
  */
 const postOrPutJSON = async (url, method, data = {}) => {
   method = method.toUpperCase();
-  if (method !== 'POST' && method !== 'PUT') {
-    throw 'Invalid method! Valid methods are POST and PUT!';
+  if (method !== "POST" && method !== "PUT") {
+    throw "Invalid method! Valid methods are POST and PUT!";
   }
 
   // TODO: 8.3 Implement this
@@ -90,7 +92,7 @@ const deleteResourse = async url => {
 const generateId = () => {
   // Shamelessly borrowed from a Gist. See:
   // https://gist.github.com/gordonbrander/2230317
-  return ('_' + Math.random().toString(36).substr(2, 9));
+  return `_${Math.random().toString(36).substr(2, 9)}`;
 };
 
 /**
@@ -103,18 +105,21 @@ const generateId = () => {
  * @param {string} containerId id attribute of the container element
  * @param {boolean} isSuccess whether the message describes a success or a failure
  */
+
 const createNotification = (message, containerId, isSuccess = true) => {
   const container = document.getElementById(containerId);
 
   // Create new p element to hold text
-  const newParagraph = document.createElement('p');
+  const newParagraph = document.createElement("p");
 
   // Create unique id for the notification so that it can easily be removed after timeout
-  const notificationId = generateId()
+  const notificationId = generateId();
   newParagraph.id = notificationId;
 
   // Set CSS class for the paragraph based on the isSuccess variable
-  newParagraph.classList.add(isSuccess ? 'background-lightgreen' : 'background-red');
+  newParagraph.classList.add(
+    isSuccess ? "background-lightgreen" : "background-red"
+  );
 
   // Add message test inside the paragraph and append the paragraph to the container
   newParagraph.append(document.createTextNode(message));
@@ -134,13 +139,14 @@ const createNotification = (message, containerId, isSuccess = true) => {
  */
 const removeElement = (containerId, elementId) => {
   const container = document.getElementById(containerId);
-  container.querySelectorAll(`#${elementId}`).forEach(element => element.remove());
+  container
+    .querySelectorAll(`#${elementId}`)
+    .forEach(element => element.remove());
 };
-
 
 /**
  * Add a product to shopping cart
- * 
+ *
  * @param {string} id containing product id
  * @returns {number} number of product with ID "id"
  */
@@ -149,8 +155,7 @@ const addProductToCart = id => {
     const productCount = parseInt(sessionStorage.getItem(id)) + 1;
     sessionStorage.setItem(id, productCount);
     return productCount;
-  }
-  else {
+  } else {
     sessionStorage.setItem(id, 1);
     return 1;
   }
@@ -158,7 +163,7 @@ const addProductToCart = id => {
 
 /**
  * Decrease product count from cart, if only one product, remove it from cart
- * 
+ *
  * @param {string} id containing product id
  * @returns {number} number of product with ID "id" after decreasing
  */
@@ -167,15 +172,13 @@ const decreaseProductCount = id => {
   if (productCount === 1) {
     sessionStorage.removeItem(id);
     return 0;
-  }
-  else {
+  } else {
     sessionStorage.setItem(id, productCount - 1);
     return productCount - 1;
   }
 };
 
-const getProductCountFromCart = id =>
-  parseInt(sessionStorage.getItem(id));
+const getProductCountFromCart = id => parseInt(sessionStorage.getItem(id));
 
 const clearCart = () => {
   sessionStorage.clear();
@@ -186,13 +189,12 @@ function Item(id, allProducts) {
   this.quantity = parseInt(sessionStorage.getItem(id));
 }
 
-
 const placeNewOrder = async () => {
   const items = Object.keys(sessionStorage);
   const allProducts = await getJSON("/api/products");
   const orderedItems = items.map(id => new Item(id, allProducts));
   if (orderedItems.length !== 0) {
-    const order = { items: orderedItems }
+    const order = { items: orderedItems };
     postOrPutJSON("/api/orders", "POST", order);
   }
-}
+};

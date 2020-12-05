@@ -1,5 +1,5 @@
-const template = document.getElementById('cart-item-template');
-const container = document.getElementById('cart-container');
+const template = document.getElementById("cart-item-template");
+const container = document.getElementById("cart-container");
 
 const URL = "http://localhost:3000/api/products";
 
@@ -34,23 +34,23 @@ const renderCart = async () => {
 
     const plusButton = itemRow.querySelectorAll(".cart-minus-plus-button")[0];
     plusButton.setAttribute("id", `plus-${id}`);
-    plusButton.addEventListener("click", () => addProduct(id)); 
+    plusButton.addEventListener("click", () => addProduct(id));
 
     const minusButton = itemRow.querySelectorAll(".cart-minus-plus-button")[1];
     minusButton.setAttribute("id", `minus-${id}`);
     minusButton.addEventListener("click", () => decreaseProduct(id));
 
     container.appendChild(itemRow);
-  })
-}
+  });
+};
 
-const addProduct = (id) => {
+const addProduct = id => {
   const newAmount = addProductToCart(id);
   const amount = document.getElementById(`amount-${id}`);
   amount.innerText = `${newAmount}x`;
-}
+};
 
-const decreaseProduct = (id) => {
+const decreaseProduct = id => {
   const newAmount = decreaseProductCount(id);
   if (!newAmount) {
     removeElement("cart-container", `product-${id}`);
@@ -58,17 +58,16 @@ const decreaseProduct = (id) => {
     const amount = document.getElementById(`amount-${id}`);
     amount.innerText = `${newAmount}x`;
   }
-}
+};
 
-document.getElementById("place-order-button").addEventListener(
-  "click",
-  async (e) => {
+document
+  .getElementById("place-order-button")
+  .addEventListener("click", async e => {
     e.preventDefault();
     await placeNewOrder();
     clearCart();
     document.getElementById("cart-container").innerHTML = "";
     createNotification("Order placed", "notifications-container", true);
-  }  
-);
+  });
 
 renderCart();
