@@ -66,20 +66,18 @@ const deleteHandle = async id => {
     container
       .querySelectorAll(`#product-${id}`)
       .forEach(element => element.remove());
-    document
-      .getElementById("modify-product")
-      .querySelectorAll("edit-product-form")
-      .forEach(element => element.remove());
   }
 };
 
 const modifyHandle = async id => {
   const url = `api/products/${id}`;
   const productInfo = await getJSON(url);
-  const formTemplate = document.getElementById("form-template");
+  const formTemplate = document
+    .getElementById("form-template")
+    .content.cloneNode(true);
   const modifyContainer = document.getElementById("modify-product");
 
-  const cloneDiv = formTemplate.content.cloneNode(true);
+  const cloneDiv = formTemplate.querySelector("#edit-product-form");
 
   const heading = cloneDiv.querySelector("h2");
   heading.innerHTML = `Modify product ${productInfo.name}`;
@@ -134,11 +132,8 @@ const modifyHandle = async id => {
           document
             .getElementById(`image-${response._id}`)
             .setAttribute("src", response.image);
-          document
-            .getElementById("modify-product")
-            .querySelectorAll("edit-product-form")
-            .forEach(element => element.remove());
         }
+        removeElement("modify-product", "edit-product-form");
       });
     }
   });

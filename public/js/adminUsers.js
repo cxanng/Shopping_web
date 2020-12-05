@@ -40,12 +40,12 @@ const formContainer = document.getElementById("modify-user");
 
 const URL = "http://localhost:3000/api/users";
 
-const updatePersonInfo = ({_id, role}) => {
+const updatePersonInfo = ({ _id, role }) => {
   const roleText = document.getElementById(`role-${_id}`);
   roleText.innerText = role;
 };
 
-const handleModify = ({_id, name, email, role}) => {
+const handleModify = ({ _id, name, email, role }) => {
   const form = formTemplate.content.cloneNode(true).querySelector("form");
   form.querySelector("h2").innerText = `Modify user ${name}`;
 
@@ -66,25 +66,17 @@ const handleModify = ({_id, name, email, role}) => {
       email,
       role: roleField.value
     });
-    createNotification(
-      `Updated user ${name}`,
-      "notifications-container",
-      true
-    );
+    createNotification(`Updated user ${name}`, "notifications-container", true);
     updatePersonInfo(updatedPerson);
     removeElement("modify-user", "edit-user-form");
-  })
+  });
 
   formContainer.appendChild(form);
 };
 
 const handleDelete = async ({ _id, name }) => {
   await deleteResourse(`${URL}/${_id}`);
-  createNotification(
-    `Deleted user ${name}`,
-    "notifications-container",
-    true
-  );
+  createNotification(`Deleted user ${name}`, "notifications-container", true);
   removeElement("users-container", `user-${_id}`);
   removeElement("modify-user", "edit-user-form");
 };
@@ -115,7 +107,7 @@ const renderPeople = people => {
 
     const deleteBtn = itemRow.querySelector(".delete-button");
     deleteBtn.setAttribute("id", `delete-${id}`);
-    deleteBtn.addEventListener("click", () => handleDelete(person))
+    deleteBtn.addEventListener("click", () => handleDelete(person));
 
     container.appendChild(itemRow);
   });
