@@ -89,7 +89,7 @@ describe('Schema validation', () => {
 
   it('must not allow "price" to be 0 or less', () => {
       const data = getTestData();
-      data.price = 0;
+      data.price = -2.0;
       const product = new Product(data);
       const error = product.validateSync();
       expect(error).to.exist; 
