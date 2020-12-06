@@ -1,3 +1,5 @@
+setLogInText();
+
 const template = document.getElementById("cart-item-template");
 const container = document.getElementById("cart-container");
 

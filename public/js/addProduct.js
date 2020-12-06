@@ -1,3 +1,5 @@
+setLogInText();
+
 document.getElementById("btnAddProduct").addEventListener("click", e => {
   e.preventDefault();
   const form = document.getElementById("add-product-form");

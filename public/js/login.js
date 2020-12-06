@@ -1,3 +1,5 @@
+setLogInText();
+
 const URL = `${getUrl()}/api/login`;
 const formTemplate = document.getElementById("log-in-template");
 const loggedInTemplate = document.getElementById("logged-in-template");
@@ -18,6 +20,7 @@ const renderLoggedIn = () => {
       true
     );
     renderForm();
+    document.getElementById("log-in-link").innerText = "Log in";
     removeElement("log-in-container", "logged-in-user");
   });
   container.appendChild(info);
@@ -50,13 +53,14 @@ const renderForm = () => {
     setToken(response.token);
     window.localStorage.setItem("logged-in", JSON.stringify(response));
     renderLoggedIn();
+    document.getElementById("log-in-link").innerText = `User ${response.name}`;
     removeElement("log-in-container", "log-in-form");
   });
 
   container.appendChild(form);
 };
 
-if (user) {
+if (getUser()) {
   renderLoggedIn();
 } else {
   renderForm();

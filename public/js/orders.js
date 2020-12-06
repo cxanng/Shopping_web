@@ -1,3 +1,5 @@
+setLogInText();
+
 const orderTemplate = document.getElementById("order-template");
 const itemTemplate = document.getElementById("order-item-template");
 const container = document.getElementById("orders-container");

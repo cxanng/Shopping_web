@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-vars */
 
-// logged in user
-let user = null;
 // JWT token
 let token = null;
 
@@ -214,4 +212,13 @@ const getUser = () => {
   }
 
   return null;
+};
+
+const setLogInText = () => {
+  const user = getUser();
+  if (user) {
+    document.getElementById("log-in-link").innerText = `User ${user.name}`;
+  } else {
+    document.getElementById("log-in-link").innerText = "Log in";
+  }
 };
