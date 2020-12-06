@@ -1,5 +1,6 @@
 const { getCredentials } = require("../utils/requestUtils");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 /**
  * Get current user based on the request headers
@@ -15,14 +16,10 @@ const getCurrentUser = async request => {
   // logged in user
 
   // throw new Error('Not Implemented');
-  const authorization = request.headers["authorization"];
-  if (!authorization) {
-    return null;
-  }
-  if (!authorization.startsWith("Basic")) {
-    return null;
-  }
   const data = getCredentials(request);
+  if (!data) {
+    return null;
+  }
   const user = await User.findOne({ email: data[0] }).exec();
   const passwordCorrect =
     user === null ? false : await user.checkPassword(data[1]);
@@ -32,4 +29,21 @@ const getCurrentUser = async request => {
   return user;
 };
 
-module.exports = { getCurrentUser };
+const verifyLoginUser = async body => {
+  const user = await User.findOne({ email: body.email }).exec();
+  const passwordCorrect =
+    user === null ? false : await user.checkPassword(body.password);
+  if (!passwordCorrect) {
+    return null;
+  }
+
+  const userForToken = {
+    email: user.email,
+    id: user._id
+  };
+
+  const token = jwt.sign(userForToken, `${process.env.SECRET}`);
+  return { token, email: user.email, name: user.name };
+};
+
+module.exports = { getCurrentUser, verifyLoginUser };

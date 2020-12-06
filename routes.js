@@ -1,7 +1,7 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { getCurrentUser } = require("./auth/auth");
+const { getCurrentUser, verifyLoginUser } = require("./auth/auth");
 const {
   getAllProducts,
   addProduct,
@@ -30,7 +30,8 @@ const allowedMethods = {
   "/api/users": ["GET"],
   "/api/products": ["POST", "GET"],
   // "/api/cart": ["GET"],
-  "/api/orders": ["GET", "POST"]
+  "/api/orders": ["GET", "POST"],
+  "/api/login": ["POST"]
 };
 
 /**
@@ -194,6 +195,12 @@ const handleRequest = async (request, response) => {
   // Require a correct accept header (require 'application/json' or '*/*')
   if (!acceptsJson(request)) {
     return responseUtils.contentTypeNotAcceptable(response);
+  }
+
+  if (filePath === "/api/login" && method.toUpperCase() === "POST") {
+    const body = await parseBodyJson(request);
+    const data = await verifyLoginUser(body);
+    return responseUtils.sendJson(response, data);
   }
 
   // GET all users

@@ -35,7 +35,7 @@
     "no-var": "error",
     "prefer-const": "error",
     "no-unreachable": "error",
-    "complexity": ["warn", 60],
+    "complexity": ["warn", 80],
     "no-invalid-this": "warn",
     "no-multi-spaces": "warn",
     "no-self-assign": "warn",

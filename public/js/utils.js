@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-vars */
 
+// logged in user
+let user = null;
+// JWT token
+let token = null;
+
 /**
  * Asynchronously fetch JSON from the given url. (GET)
  *
@@ -200,3 +205,13 @@ const placeNewOrder = async () => {
 };
 
 const getUrl = () => window.location.origin;
+const setToken = newToken => (token = `bearer ${newToken}`);
+
+const getUser = () => {
+  const loggedInUser = window.localStorage.getItem("logged-in");
+  if (loggedInUser) {
+    return JSON.parse(loggedInUser);
+  }
+
+  return null;
+};
