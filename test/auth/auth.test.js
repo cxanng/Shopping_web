@@ -7,9 +7,6 @@ const { getCurrentUser, verifyLoginUser } = require('../../auth/auth');
 const User = require('../../models/user');
 
 // helper function for authorization headers
-const encodeCredentials = (username, password) =>
-  Buffer.from(`${username}:${password}`, 'utf-8').toString('base64');
-
 const getToken = credential => credential ? `Bearer ${credential.token}` : null;
 
 const getRequest = headers => createRequest({ headers });

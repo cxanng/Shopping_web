@@ -2,6 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const { handleRequest } = require('../routes');
+const { verifyLoginUser } = require("../auth/auth");
 
 const registrationUrl = '/api/register';
 const usersUrl = '/api/users';
@@ -13,10 +14,10 @@ chai.use(chaiHttp);
 const User = require('../models/user');
 const Product = require('../models/product');
 const Order = require('../models/order');
+const { getSupportInfo } = require('prettier');
 
 // helper function for authorization headers
-const encodeCredentials = (username, password) =>
-  Buffer.from(`${username}:${password}`, 'utf-8').toString('base64');
+const getToken = credential => credential ? `Bearer ${credential.token}` : null;
 
 // helper function for creating randomized test data
 const generateRandomString = (len = 9) => {
@@ -41,16 +42,15 @@ const users = require('../setup/users.json').map(user => ({ ...user }));
 const adminUser = { ...users.find(u => u.role === 'admin') };
 const customerUser = { ...users.find(u => u.role === 'customer') };
 
-const adminCredentials = encodeCredentials(adminUser.email, adminUser.password);
-const customerCredentials = encodeCredentials(customerUser.email, customerUser.password);
-const invalidCredentials = encodeCredentials(adminUser.email, customerUser.password);
-
 const unknownUrls = [`/${generateRandomString(20)}.html`, `/api/${generateRandomString(20)}`];
 
 describe('Routes', () => {
   let allUsers;
   let allProducts;
   let allOrders;
+  let adminCredentials;
+  let customerCredentials;
+  let invalidCredentials;
 
   // get randomized test user
   const getTestUser = () => {
@@ -94,6 +94,10 @@ describe('Routes', () => {
     await Product.deleteMany({});
     await Product.create(products);
     allProducts = await Product.find({});
+
+    adminCredentials = await verifyLoginUser(adminUser);
+    customerCredentials = await verifyLoginUser(customerUser);
+    invalidCredentials = await verifyLoginUser({ email: adminUser.email, password: customerUser.password });
 
     const orders = allUsers.map(user => {
       return {
@@ -321,17 +325,7 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(usersUrl)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization header is empty', async () => {
+      it('should respond with "401 Unauthorized" when Authorization header is empty', async () => {
         const response = await chai
           .request(handleRequest)
           .get(usersUrl)
@@ -339,29 +333,16 @@ describe('Routes', () => {
           .set('Authorization', '');
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is not properly encoded', async () => {
+      it('should respond with "401 Unauthorized" when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(usersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminUser.email}:${adminUser.password}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(usersUrl)
-          .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -369,7 +350,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(usersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(403);
       });
@@ -379,7 +360,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(usersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -411,25 +392,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(url)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
+      it('should respond with "401 Unauthorized" when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -437,7 +407,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(403);
       });
@@ -446,7 +416,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -455,7 +425,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -464,7 +434,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -477,7 +447,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(`${usersUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -511,22 +481,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai.request(handleRequest).put(url);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
+      it('should respond with "401 Unauthorized" when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -534,7 +496,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(user);
 
         expect(response).to.have.status(403);
@@ -544,7 +506,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .put(url)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(user);
         expect(response).to.have.status(406);
       });
@@ -554,7 +516,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(user);
         expect(response).to.have.status(406);
       });
@@ -564,7 +526,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(user);
 
         expect(response).to.have.status(200);
@@ -585,7 +547,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(userWithExtra);
 
         expect(response).to.have.status(200);
@@ -608,7 +570,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(userWithExtra);
 
         expect(response).to.have.status(400);
@@ -622,7 +584,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send({ role: generateRandomString() });
 
         expect(response).to.have.status(400);
@@ -636,7 +598,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(`${usersUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(user);
 
         expect(response).to.have.status(404);
@@ -667,25 +629,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .delete(url)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -693,7 +644,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(403);
       });
@@ -702,7 +653,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .delete(url)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -711,7 +662,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -720,7 +671,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         const dbUsers = await User.find({});
         expect(response).to.have.status(200);
@@ -732,7 +683,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         const dbUsers = await User.find({});
         expect(response).to.have.status(200);
@@ -747,7 +698,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(`${usersUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -766,25 +717,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(productsUrl)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with Basic Auth Challenge when Authorization header is empty', async () => {
@@ -795,18 +735,6 @@ describe('Routes', () => {
           .set('Authorization', '');
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization header is not properly encoded', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(productsUrl)
-          .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminUser.email}:${adminUser.password}`);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "406 Not Acceptable" when Accept header is missing', async () => {
@@ -828,7 +756,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -840,7 +768,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -853,7 +781,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -866,7 +794,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -897,32 +825,21 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(url)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "406 Not Acceptable" when Accept header is missing', async () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -931,7 +848,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -940,7 +857,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -953,7 +870,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -966,7 +883,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(`${productsUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -1002,22 +919,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai.request(handleRequest).put(url);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -1025,7 +934,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(product);
 
         expect(response).to.have.status(403);
@@ -1035,7 +944,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .put(url)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
         expect(response).to.have.status(406);
       });
@@ -1045,7 +954,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
         expect(response).to.have.status(406);
       });
@@ -1055,7 +964,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
 
         expect(response).to.have.status(200);
@@ -1078,7 +987,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(productWithPartialData);
 
         expect(response).to.have.status(200);
@@ -1097,7 +1006,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send({ name: '' });
 
         expect(response).to.have.status(400);
@@ -1111,7 +1020,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send({ price: generateRandomString() });
 
         expect(response).to.have.status(400);
@@ -1125,7 +1034,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send({ price: 0 });
 
         expect(response).to.have.status(400);
@@ -1139,7 +1048,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send({ price: -2.5 });
 
         expect(response).to.have.status(400);
@@ -1153,7 +1062,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .put(`${productsUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
 
         expect(response).to.have.status(404);
@@ -1190,18 +1099,6 @@ describe('Routes', () => {
           .set('Accept', contentType);
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .delete(url)
-          .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -1209,7 +1106,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(403);
       });
@@ -1218,7 +1115,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .delete(url)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -1227,7 +1124,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -1236,7 +1133,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         const dbProducts = await Product.find({});
         expect(response).to.have.status(200);
@@ -1248,7 +1145,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         const dbProducts = await Product.find({});
         expect(response).to.have.status(200);
@@ -1263,7 +1160,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .delete(`${productsUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -1275,7 +1172,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .post(productsUrl)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
         expect(response).to.have.status(406);
       });
@@ -1286,7 +1183,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
         expect(response).to.have.status(406);
       });
@@ -1302,29 +1199,16 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const product = getTestProduct();
-        const response = await chai
-          .request(handleRequest)
-          .post(productsUrl)
-          .set('Accept', contentType)
-          .send(product);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const product = getTestProduct();
         const response = await chai
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`)
+          .set('Authorization', getToken(invalidCredentials))
           .send(product);
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when customer credentials are received', async () => {
@@ -1333,7 +1217,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(product);
 
         expect(response).to.have.status(403);
@@ -1345,7 +1229,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(body);
         expect(response).to.have.status(400);
       });
@@ -1358,7 +1242,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
 
         expect(response).to.have.status(400);
@@ -1375,7 +1259,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
 
         expect(response).to.have.status(400);
@@ -1391,7 +1275,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(productsUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(product);
 
         const createdProduct = await Product.findOne({
@@ -1427,25 +1311,14 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(ordersUrl)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with Basic Auth Challenge when Authorization header is empty', async () => {
@@ -1456,18 +1329,6 @@ describe('Routes', () => {
           .set('Authorization', '');
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
-      it('should respond with Basic Auth Challenge when Authorization header is not properly encoded', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(ordersUrl)
-          .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminUser.email}:${adminUser.password}`);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "406 Not Acceptable" when Accept header is missing', async () => {
@@ -1489,7 +1350,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1501,7 +1362,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1514,7 +1375,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1532,7 +1393,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1566,32 +1427,21 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const response = await chai
-          .request(handleRequest)
-          .get(url)
-          .set('Accept', contentType);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`);
+          .set('Authorization', getToken(invalidCredentials));
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "406 Not Acceptable" when Accept header is missing', async () => {
         const response = await chai
           .request(handleRequest)
           .get(url)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -1600,7 +1450,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
         expect(response).to.have.status(406);
       });
 
@@ -1610,7 +1460,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1624,7 +1474,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(url)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -1637,7 +1487,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(`${ordersUrl}/${unknownId}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`);
+          .set('Authorization', getToken(adminCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -1650,7 +1500,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .get(`${ordersUrl}/${order.id}`)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`);
+          .set('Authorization', getToken(customerCredentials));
 
         expect(response).to.have.status(404);
       });
@@ -1662,7 +1512,7 @@ describe('Routes', () => {
         const response = await chai
           .request(handleRequest)
           .post(ordersUrl)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
         expect(response).to.have.status(406);
       });
@@ -1673,7 +1523,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', 'text/html')
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
         expect(response).to.have.status(406);
       });
@@ -1689,29 +1539,16 @@ describe('Routes', () => {
         expect(response).to.have.status(401);
       });
 
-      it('should respond with Basic Auth Challenge when Authorization header is missing', async () => {
-        const order = getTestOrder();
-        const response = await chai
-          .request(handleRequest)
-          .post(ordersUrl)
-          .set('Accept', contentType)
-          .send(order);
-
-        expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
-      });
-
       it('should respond with Basic Auth Challenge when Authorization credentials are incorrect', async () => {
         const order = getTestOrder();
         const response = await chai
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${invalidCredentials}`)
+          .set('Authorization', getToken(invalidCredentials))
           .send(order);
 
         expect(response).to.have.status(401);
-        expect(response).to.have.header('www-authenticate', /basic/i);
       });
 
       it('should respond with "403 Forbidden" when admin credentials are received', async () => {
@@ -1720,7 +1557,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${adminCredentials}`)
+          .set('Authorization', getToken(adminCredentials))
           .send(order);
 
         expect(response).to.have.status(403);
@@ -1732,7 +1569,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(body);
         expect(response).to.have.status(400);
       });
@@ -1745,7 +1582,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1762,7 +1599,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1779,7 +1616,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1796,7 +1633,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1813,7 +1650,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1830,7 +1667,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         expect(response).to.have.status(400);
@@ -1846,7 +1683,7 @@ describe('Routes', () => {
           .request(handleRequest)
           .post(ordersUrl)
           .set('Accept', contentType)
-          .set('Authorization', `Basic ${customerCredentials}`)
+          .set('Authorization', getToken(customerCredentials))
           .send(order);
 
         const orders = await Order.find({}).exec();

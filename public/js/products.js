@@ -52,10 +52,8 @@ const addProduct = ({ _id, name }) => {
 };
 
 const productLoad = async () => {
-  if (getUser()) {
-    const products = await getJSON(URL);
-    renderProduct(products);
-  }
+  const products = await getJSON(URL);
+  renderProduct(products);
   // TODO: handle message tell unsigned-in customers to sign in
 };
 

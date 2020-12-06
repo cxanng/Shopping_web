@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 setLogInText();
 
->>>>>>> parent of c62ecd1... revert to phase1 to submit
 const template = document.getElementById("cart-item-template");
 const container = document.getElementById("cart-container");
 
@@ -17,14 +14,6 @@ const getAllProductsFromCart = async () => {
 };
 
 const renderCart = async () => {
-<<<<<<< HEAD
-=======
-  if (!getUser()) {
-    // TODO: handle message tell customer to log in first
-    return;
-  }
-
->>>>>>> parent of c62ecd1... revert to phase1 to submit
   const products = await getAllProductsFromCart();
   products.forEach(product => {
     const id = product.item._id;
@@ -61,7 +50,6 @@ const addProduct = id => {
   const newAmount = addProductToCart(id);
   const amount = document.getElementById(`amount-${id}`);
   amount.innerText = `${newAmount}x`;
-<<<<<<< HEAD
 };
 
 const decreaseProduct = id => {
@@ -74,20 +62,6 @@ const decreaseProduct = id => {
   }
 };
 
-=======
-};
-
-const decreaseProduct = id => {
-  const newAmount = decreaseProductCount(id);
-  if (!newAmount) {
-    removeElement("cart-container", `product-${id}`);
-  } else {
-    const amount = document.getElementById(`amount-${id}`);
-    amount.innerText = `${newAmount}x`;
-  }
-};
-
->>>>>>> parent of c62ecd1... revert to phase1 to submit
 document
   .getElementById("place-order-button")
   .addEventListener("click", async e => {

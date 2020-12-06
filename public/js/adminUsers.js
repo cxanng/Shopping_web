@@ -114,10 +114,8 @@ const renderPeople = people => {
 };
 
 const adminUser = async () => {
-  if (getUser()) {
-    const people = await getJSON(URL);
-    renderPeople(people);
-  }
+  const people = await getJSON(URL);
+  renderPeople(people);
   // TODO: handle message tell unsigned-in customers to sign in
 };
 
