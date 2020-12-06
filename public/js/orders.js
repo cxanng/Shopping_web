@@ -1,5 +1,3 @@
-setLogInText();
-
 const orderTemplate = document.getElementById("order-template");
 const itemTemplate = document.getElementById("order-item-template");
 const container = document.getElementById("orders-container");
@@ -52,10 +50,7 @@ const renderOrder = orders => {
 };
 
 const orderLoad = async () => {
-  if (getUser()) {
-    const orders = await getJSON(URL);
-    renderOrder(orders);
-  }
-  // TODO: handle message tell unsigned-in customers to sign in
+  const orders = await getJSON(URL);
+  renderOrder(orders);
 };
 orderLoad();

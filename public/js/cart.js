@@ -1,80 +1,56 @@
-setLogInText();
+const orderTemplate = document.getElementById("order-template");
+const itemTemplate = document.getElementById("order-item-template");
+const container = document.getElementById("orders-container");
 
-const template = document.getElementById("cart-item-template");
-const container = document.getElementById("cart-container");
+const URL = `${getUrl()}/api/orders`;
 
-const URL = `${getUrl()}/api/products`;
+const renderOrder = orders => {
+  orders.forEach(order => {
+    const orderId = order._id;
+    const orderNode = orderTemplate.content.cloneNode(true);
 
-const getAllProductsFromCart = async () => {
-  const products = await getJSON(URL);
-  return Object.keys(sessionStorage).map(key => ({
-    item: products.find(element => element._id === key),
-    count: parseInt(sessionStorage.getItem(key))
-  }));
-};
+    const orderRow = orderNode.querySelector("div");
+    orderRow.setAttribute("id", `order-${orderId}`);
+    let total = 0.0;
+    order.items.forEach(orderedItem => {
+      const productId = orderedItem._id;
+      const itemNode = itemTemplate.content.cloneNode(true);
 
-const renderCart = async () => {
-  if (!getUser()) {
-    // TODO: handle message tell customer to log in first
-    return;
-  }
+      const itemRow = itemNode.querySelector("div");
+      itemRow.setAttribute("id", `product-${productId}`);
 
-  const products = await getAllProductsFromCart();
-  products.forEach(product => {
-    const id = product.item._id;
-    const newProduct = template.content.cloneNode(true);
+      const name = itemRow.querySelector(".product-name");
+      name.setAttribute("id", `name-${productId}`);
+      name.innerText = `Name: ${orderedItem.product.name}`;
 
-    const itemRow = newProduct.querySelector(".item-row");
-    itemRow.setAttribute("id", `product-${id}`);
+      const description = itemRow.querySelector(".product-description");
+      description.setAttribute("id", `description-${productId}`);
+      description.innerText = `Description: ${orderedItem.product.description}`;
 
-    const name = itemRow.querySelector("h3");
-    name.setAttribute("id", `name-${id}`);
-    name.innerText = product.item.name;
+      const price = itemRow.querySelector(".product-price");
+      price.setAttribute("id", `price-${productId}`);
+      price.innerText = `Price: ${orderedItem.product.price}`;
 
-    const price = itemRow.querySelector(".product-price");
-    price.setAttribute("id", `price-${id}`);
-    price.innerText = product.item.price;
+      const amount = itemRow.querySelector(".product-amount");
+      amount.setAttribute("id", `amount-${productId}`);
+      amount.innerText = `Quantity: ${orderedItem.quantity}`;
 
-    const amount = itemRow.querySelector(".product-amount");
-    amount.setAttribute("id", `amount-${id}`);
-    amount.innerText = `${product.count}x`;
+      total =
+        total +
+        Number(orderedItem.product.price) * Number(orderedItem.quantity);
 
-    const plusButton = itemRow.querySelectorAll(".cart-minus-plus-button")[0];
-    plusButton.setAttribute("id", `plus-${id}`);
-    plusButton.addEventListener("click", () => addProduct(id));
-
-    const minusButton = itemRow.querySelectorAll(".cart-minus-plus-button")[1];
-    minusButton.setAttribute("id", `minus-${id}`);
-    minusButton.addEventListener("click", () => decreaseProduct(id));
-
-    container.appendChild(itemRow);
+      orderRow.appendChild(itemRow);
+    });
+    orderNode.querySelector(
+      ".total-price"
+    ).innerText = `Total price for order: ${total}`;
+    console.log(total);
+    container.appendChild(orderNode);
   });
 };
 
-const addProduct = id => {
-  const newAmount = addProductToCart(id);
-  const amount = document.getElementById(`amount-${id}`);
-  amount.innerText = `${newAmount}x`;
+const orderLoad = async () => {
+  const orders = await getJSON(URL);
+  renderOrder(orders);
 };
-
-const decreaseProduct = id => {
-  const newAmount = decreaseProductCount(id);
-  if (!newAmount) {
-    removeElement("cart-container", `product-${id}`);
-  } else {
-    const amount = document.getElementById(`amount-${id}`);
-    amount.innerText = `${newAmount}x`;
-  }
-};
-
-document
-  .getElementById("place-order-button")
-  .addEventListener("click", async e => {
-    e.preventDefault();
-    await placeNewOrder();
-    clearCart();
-    document.getElementById("cart-container").innerHTML = "";
-    createNotification("Order placed", "notifications-container", true);
-  });
-
-renderCart();
+orderLoad();

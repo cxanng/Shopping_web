@@ -45,9 +45,6 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-async-errors": "^3.1.1",
-    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.3",
     "mongoose": "^5.10.10",
     "puppeteer": "^5.4.1"

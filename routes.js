@@ -1,7 +1,7 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
-const { getCurrentUser, verifyLoginUser } = require("./auth/auth");
+const { getCurrentUser } = require("./auth/auth");
 const {
   getAllProducts,
   addProduct,
@@ -30,8 +30,7 @@ const allowedMethods = {
   "/api/users": ["GET"],
   "/api/products": ["POST", "GET"],
   // "/api/cart": ["GET"],
-  "/api/orders": ["GET", "POST"],
-  "/api/login": ["POST"]
+  "/api/orders": ["GET", "POST"]
 };
 
 /**
@@ -117,7 +116,7 @@ const handleRequest = async (request, response) => {
     if (authorize && acceptable) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       const desiredId = url.split("/")[3];
       switch (method.toUpperCase()) {
@@ -131,7 +130,7 @@ const handleRequest = async (request, response) => {
           return deleteUser(response, desiredId, user);
       }
     } else if (!authorize) {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     } else if (!acceptable) {
       return responseUtils.contentTypeNotAcceptable(response);
     }
@@ -143,7 +142,7 @@ const handleRequest = async (request, response) => {
     if (authorize && acceptable) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       const desiredId = url.split("/")[3];
       switch (method.toUpperCase()) {
@@ -157,7 +156,7 @@ const handleRequest = async (request, response) => {
           return deleteProduct(response, desiredId, user);
       }
     } else if (!authorize) {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     } else if (!acceptable) {
       return responseUtils.contentTypeNotAcceptable(response);
     }
@@ -169,12 +168,12 @@ const handleRequest = async (request, response) => {
     if (authorize && acceptable) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       const desiredId = url.split("/")[3];
       return viewOrder(response, desiredId, user);
     } else if (!authorize) {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     } else if (!acceptable) {
       return responseUtils.contentTypeNotAcceptable(response);
     }
@@ -197,12 +196,6 @@ const handleRequest = async (request, response) => {
     return responseUtils.contentTypeNotAcceptable(response);
   }
 
-  if (filePath === "/api/login" && method.toUpperCase() === "POST") {
-    const body = await parseBodyJson(request);
-    const data = await verifyLoginUser(body);
-    return responseUtils.sendJson(response, data);
-  }
-
   // GET all users
   if (filePath === "/api/users" && method.toUpperCase() === "GET") {
     // TODO: 8.3 Return all users as JSON
@@ -211,14 +204,14 @@ const handleRequest = async (request, response) => {
     if (authorize) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       if (user.role === "customer") {
         return responseUtils.forbidden(response);
       }
       return getAllUsers(response);
     } else {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     }
   }
 
@@ -228,11 +221,11 @@ const handleRequest = async (request, response) => {
     if (authorize) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       return getAllProducts(response);
     }
-    return responseUtils.unauthorized(response);
+    return responseUtils.basicAuthChallenge(response);
   }
 
   // get all orders
@@ -241,11 +234,11 @@ const handleRequest = async (request, response) => {
     if (authorize) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       return getAllOrders(response, user);
     }
-    return responseUtils.unauthorized(response);
+    return responseUtils.basicAuthChallenge(response);
   }
 
   // add new product
@@ -261,12 +254,12 @@ const handleRequest = async (request, response) => {
     if (authorize) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       const payload = await parseBodyJson(request);
       return addProduct(response, user, payload);
     } else {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     }
   }
 
@@ -282,12 +275,12 @@ const handleRequest = async (request, response) => {
     if (authorize) {
       const user = await getCurrentUser(request);
       if (!user) {
-        return responseUtils.unauthorized(response);
+        return responseUtils.basicAuthChallenge(response);
       }
       const payload = await parseBodyJson(request);
       return addOrder(response, user, payload);
     } else {
-      return responseUtils.unauthorized(response);
+      return responseUtils.basicAuthChallenge(response);
     }
   }
 
