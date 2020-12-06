@@ -16,16 +16,15 @@ const getCurrentUser = async request => {
   // logged in user
 
   // throw new Error('Not Implemented');
-  const data = getCredentials(request);
-  if (!data) {
+  const token = getCredentials(request);
+  if (!token) {
     return null;
   }
-  const user = await User.findOne({ email: data[0] }).exec();
-  const passwordCorrect =
-    user === null ? false : await user.checkPassword(data[1]);
-  if (!passwordCorrect) {
+  const decodedToken = jwt.verify(token, `${process.env.SECRET}`);
+  if (!token || !decodedToken.email) {
     return null;
   }
+  const user = await User.findOne({ email: decodedToken.email }).exec();
   return user;
 };
 

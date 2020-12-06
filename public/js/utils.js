@@ -1,8 +1,5 @@
 /* eslint-disable no-unused-vars */
 
-// JWT token
-let token = null;
-
 /**
  * Asynchronously fetch JSON from the given url. (GET)
  *
@@ -29,7 +26,8 @@ const getJSON = async url => {
   const json = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      Authorization: getToken()
     }
   });
   return json.json();
@@ -57,7 +55,8 @@ const postOrPutJSON = async (url, method, data = {}) => {
   const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      Authorization: getToken()
     },
     method,
     body: JSON.stringify(data)
@@ -78,7 +77,8 @@ const deleteResourse = async url => {
   // TODO: 8.5 Implement this
   const response = await fetch(url, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: getToken()
     },
     method: "DELETE"
   });
@@ -203,7 +203,10 @@ const placeNewOrder = async () => {
 };
 
 const getUrl = () => window.location.origin;
-const setToken = newToken => (token = `bearer ${newToken}`);
+const getToken = () => {
+  const user = getUser();
+  return user ? `bearer ${user.token}` : null;
+};
 
 const getUser = () => {
   const loggedInUser = window.localStorage.getItem("logged-in");

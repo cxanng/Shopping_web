@@ -12,7 +12,6 @@ const renderLoggedIn = () => {
   info.querySelector("p").innerText = `Logged in as ${getUser().name}`;
   info.querySelector(".log-out-button").addEventListener("click", e => {
     e.preventDefault();
-    setToken("");
     window.localStorage.removeItem("logged-in");
     createNotification(
       "Logged out successfully",
@@ -50,7 +49,6 @@ const renderForm = () => {
       "notifications-container",
       true
     );
-    setToken(response.token);
     window.localStorage.setItem("logged-in", JSON.stringify(response));
     renderLoggedIn();
     document.getElementById("log-in-link").innerText = `User ${response.name}`;

@@ -42,7 +42,7 @@
     "require-await": "warn",
     "no-shadow": "warn",
     "comma-spacing": "warn",
-    "max-lines-per-function": ["warn", 210],
+    "max-lines-per-function": ["warn", 300],
     "prefer-object-spread": "warn",
     "prefer-template": "warn",
     "no-trailing-spaces": "error",
