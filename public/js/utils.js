@@ -210,6 +210,7 @@ const getToken = () => {
 
 const getUser = () => {
   const loggedInUser = window.localStorage.getItem("logged-in");
+  console.log(loggedInUser)
   if (loggedInUser) {
     return JSON.parse(loggedInUser);
   }
