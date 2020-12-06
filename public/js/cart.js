@@ -14,6 +14,11 @@ const getAllProductsFromCart = async () => {
 };
 
 const renderCart = async () => {
+  if (!getUser()) {
+    // TODO: handle message tell customer to log in first
+    return;
+  }
+
   const products = await getAllProductsFromCart();
   products.forEach(product => {
     const id = product.item._id;

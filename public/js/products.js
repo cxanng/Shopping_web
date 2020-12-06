@@ -52,8 +52,11 @@ const addProduct = ({ _id, name }) => {
 };
 
 const productLoad = async () => {
-  const products = await getJSON(URL);
-  renderProduct(products);
+  if (getUser()) {
+    const products = await getJSON(URL);
+    renderProduct(products);
+  }
+  // TODO: handle message tell unsigned-in customers to sign in
 };
 
 const deleteHandle = async id => {

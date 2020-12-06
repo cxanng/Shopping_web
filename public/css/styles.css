@@ -119,7 +119,7 @@ button:hover {
 }
 
 img {
-  max-width: 250;
+  max-width: 500px;
   height: auto;
   border-radius: 10px;
 }
@@ -132,7 +132,7 @@ img {
 
 .order-row {
   background-color: lightcyan;
-  padding-left: 2;
+  padding-left: 2px;
   margin: auto;
   border-width: 1px;
   border-style: solid;

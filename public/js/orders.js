@@ -52,7 +52,10 @@ const renderOrder = orders => {
 };
 
 const orderLoad = async () => {
-  const orders = await getJSON(URL);
-  renderOrder(orders);
+  if (getUser()) {
+    const orders = await getJSON(URL);
+    renderOrder(orders);
+  }
+  // TODO: handle message tell unsigned-in customers to sign in
 };
 orderLoad();
