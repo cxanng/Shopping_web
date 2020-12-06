@@ -61,6 +61,10 @@ The system follows MVC structure, which means interactions between Model and Vie
     ![MVC Diagram](./public/images/MVC.png "MVC diagram")
 
     The final system support REST api which allow user to access suitable rights with their role
+    Below are sequence diagrams of specific actions that each role can get access to:
+
+        ![Admin Sequence Diagram](./public/images/adminProcess.png "Admin sequence diagram")
+        ![Customer And Unregistered User Diagram](./public/images/customerSequence.png "Customer and unregistered user")
 
 ## Tests and documentation
 
