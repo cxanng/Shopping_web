@@ -26,7 +26,8 @@ const getJSON = async url => {
   const json = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      Authorization: getToken()
     }
   });
   return json.json();
@@ -54,7 +55,8 @@ const postOrPutJSON = async (url, method, data = {}) => {
   const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      Authorization: getToken()
     },
     method,
     body: JSON.stringify(data)
@@ -75,7 +77,8 @@ const deleteResourse = async url => {
   // TODO: 8.5 Implement this
   const response = await fetch(url, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: getToken()
     },
     method: "DELETE"
   });
@@ -200,3 +203,25 @@ const placeNewOrder = async () => {
 };
 
 const getUrl = () => window.location.origin;
+const getToken = () => {
+  const user = getUser();
+  return user ? `bearer ${user.token}` : null;
+};
+
+const getUser = () => {
+  const loggedInUser = window.localStorage.getItem("logged-in");
+  if (loggedInUser) {
+    return JSON.parse(loggedInUser);
+  }
+
+  return null;
+};
+
+const setLogInText = () => {
+  const user = getUser();
+  if (user) {
+    document.getElementById("log-in-link").innerText = `User ${user.name}`;
+  } else {
+    document.getElementById("log-in-link").innerText = "Log in";
+  }
+};
