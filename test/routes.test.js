@@ -14,7 +14,6 @@ chai.use(chaiHttp);
 const User = require('../models/user');
 const Product = require('../models/product');
 const Order = require('../models/order');
-const { getSupportInfo } = require('prettier');
 
 // helper function for authorization headers
 const getToken = credential => credential ? `Bearer ${credential.token}` : null;
