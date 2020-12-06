@@ -21,7 +21,7 @@ const getCurrentUser = async request => {
     return null;
   }
   const decodedToken = jwt.verify(token, `${process.env.SECRET}`);
-  if (!token || !decodedToken.email) {
+  if (!decodedToken.email) {
     return null;
   }
   const user = await User.findOne({ email: decodedToken.email }).exec();

@@ -9,7 +9,7 @@ const getCredentials = request => {
     return null;
   }
   const code = request.headers["authorization"];
-  if (!code.startsWith("bearer ")) {
+  if (!code.toLowerCase().startsWith("bearer ")) {
     return null;
   }
   return code.substring(7);
