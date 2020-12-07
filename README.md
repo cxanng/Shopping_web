@@ -67,24 +67,31 @@ TODO: describe added files here and give them short descriptions
     - images of diagrams
 
 ## The architecture 
-
-TODO: describe the system, important buzzwords include MVC and REST.
-UML diagrams would be highly appreciated.
-
-The system follows MVC structure, which means interactions between Model and View must go through Controller.
+The system follows MVC structure. In this architecture, client's request would go through a router, which would call logics in Controller. Controller would communicate with the Models to get the data to handle the logics. Models communicates with our database, which is MongoDB, to bring data to Controller. Static web page will be sent as HTML via the View to client to render.database.
     ![MVC Diagram](./public/images/MVC.png "MVC diagram")
 
-    The final system support REST api which allow user to access suitable rights with their role
-    Below are sequence diagrams of specific actions that each role can get access to:
-![Admin Sequence Diagram](./public/images/adminProcess.png "Admin sequence diagram")
-![Customer And Unregistered User Diagram](./public/images/customerSequence.png "Customer and unregistered user")
+Ofcourse, the request should be authenticated before and further logics happen. The final system support authentication which allows user to access suitable rights with their roles. Authentication is done using Basic Authentication in master branch, and JWT in "JWT" branch.  
+The backend is built following REST api. Some example operations are:
+- User
+  - Add user (POST)
+  - Delete user (DELETE)
+  - Modify user (PUT)
+  - Get all users (GET)
+- Product
+  - Add product (admin only) (POST)
+  - Delete product (DELETE)
+  - Update product (PUT)
+  - Get all products (GET)
+Below are sequence diagrams of specific actions that each role can get access to:
+    ![Admin Sequence Diagram](./public/images/adminProcess.png "Admin sequence diagram")
+    ![Customer And Unregistered User Diagram](./public/images/customerSequence.png "Customer and unregistered user")
 
 ## Tests and documentation
 
 TODO: Links to at least 10 of your group's GitLab issues, and their associated Mocha tests and test files.
 
 # Additional features
-1. Jsonwebtoken (JWT) and login page  
+1. Jsonwebtoken (JWT) and login page (branch JWT)  
 - We have added a new page for user to login. User must login in order to access other pages. At this time, we are using server-side rendering, so we let the server to handle the permissions regarding accessibilies to pages and functionalities.
 - We change the authentication method to JWT. The token, once signed by the server, would be sent back to the client and stored in the localStorage. This way of storing token is quite vulnerable to XSS attacks. More reasons would be discussed further in Security section.
 
