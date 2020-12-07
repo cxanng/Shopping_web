@@ -42,7 +42,7 @@ const verifyLoginUser = async body => {
   };
 
   const token = jwt.sign(userForToken, `${process.env.SECRET}`);
-  return { token, email: user.email, name: user.name };
+  return { token, email: user.email, name: user.name, role: user.role };
 };
 
 module.exports = { getCurrentUser, verifyLoginUser };

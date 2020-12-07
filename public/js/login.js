@@ -50,6 +50,7 @@ const renderForm = () => {
       true
     );
     window.localStorage.setItem("logged-in", JSON.stringify(response));
+    console.log(response)
     renderLoggedIn();
     document.getElementById("log-in-link").innerText = `User ${response.name}`;
     removeElement("log-in-container", "log-in-form");
