@@ -18,6 +18,7 @@ const renderProduct = products => {
     const image = itemRow.querySelector(".product-image");
     image.setAttribute("id", `image-${id}`);
     image.setAttribute("src", product.image);
+    image.setAttribute("alt", `Image of ${name}`);
 
     const description = itemRow.querySelector(".product-description");
     description.setAttribute("id", `description-${id}`);
