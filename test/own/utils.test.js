@@ -2,31 +2,10 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const Product = require('../../models/product');
-const User = require('../../models/user');
-
-const { createResponse } = require('node-mocks-http');
-const {
-  registerProduct,
-  deleteProduct,
-  updateProduct
-} = require('../../controllers/products');
 
 const users = require('../../setup/users.json').map(user => ({ ...user }));
 const adminUser = { ...users.find(u => u.role === 'admin') };
 const customerUser = { ...users.find(u => u.role === 'customer') };
-// Get products
-const products = require('../../setup/products.json').map(product => ({ ...product }));
-// Set variables
-const productsUrl = '/api/products';
-const contentType = 'application/json';
-
-// helper function for authorization headers
-const encodeCredentials = (username, password) =>
-  Buffer.from(`${username}:${password}`, 'utf-8').toString('base64');
-
-const adminCredentials = encodeCredentials(adminUser.email, adminUser.password);
-const customerCredentials = encodeCredentials(customerUser.email, customerUser.password);
-const invalidCredentials = encodeCredentials(adminUser.email, customerUser.password);
 
 // helper function for creating randomized test data
 const generateRandomString = (len = 9) => {
@@ -51,14 +30,27 @@ const getTestData = () => {
 describe('Product Model', () => {
 describe('Schema validation', () => {
   it('must require "name"', () => {
-      // 10.3
-      // expect(() => {}).to.throw(); 
-      // 10.5
       const data = getTestData();
       delete data.name;
       const product = new Product(data);
       const error = product.validateSync();
       expect(error).to.exist;
+  });
+
+  it('must not "name" to be longer than 50 letters', () => {
+    const data = getTestData();
+    data.name = generateRandomString(51);
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.exist;
+  });
+
+  it('must not allow empty name', () => {
+    const data = getTestData();
+    data.name = '';
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.exist;
   });
 
   it('must not allow "name" to have only spaces', () => {
@@ -77,12 +69,44 @@ describe('Schema validation', () => {
       expect(error).to.exist;
   });
 
-  it('must not allow "price" to be 0 or less', () => {
+  it('"price" must be a number', () => {
+    const data = getTestData();
+    data.price = generateRandomString();
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.exist;
+  });
+
+  it('must not allow "price" to be 0', () => {
       const data = getTestData();
-      data.price = -2.0;
+      data.price = 0;
       const product = new Product(data);
       const error = product.validateSync();
       expect(error).to.exist; 
   });
+
+  it('must not allow "price" to be 0', () => {
+    const data = getTestData();
+    data.price = -2.0;
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.exist; 
+  });
+
+  it('"image" url must be valid', () => {
+    const data = getTestData();
+    data.image = generateRandomString();
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.exist;
+  });
+  it('must allow valid "image" url', () => {
+    const data = getTestData();
+    data.image = "https://www.google.com/imgres?imgurl=https%3A%2F%2Fp.bigstockphoto.com%2FGeFvQkBbSLaMdpKXF1Zv_bigstock-Aerial-View-Of-Blue-Lakes-And--227291596.jpg&imgrefurl=https%3A%2F%2Fwww.bigstockphoto.com%2F&tbnid=I0zAF9TavGWK5M&vet=12ahUKEwihhpGD5LrtAhVUgosKHe4HBWAQMygCegUIARCpAQ..i&docid=y3nWK2hdEell5M&w=1028&h=432&q=image&ved=2ahUKEwihhpGD5LrtAhVUgosKHe4HBWAQMygCegUIARCpAQ";
+    const product = new Product(data);
+    const error = product.validateSync();
+    expect(error).to.be.undefined;
+  });
+
 });
 });

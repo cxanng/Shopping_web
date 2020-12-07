@@ -28,7 +28,10 @@ const productSchema = new Schema({
   image: {
     type: String,
     description:
-      "Adding product images to the Web store API and pages is a Level 2 development grader substitute"
+      "Adding product images to the Web store API and pages is a Level 2 development grader substitute",
+    validate: input => {
+      return input.match(/^(http|https):\/\/\S+\.\w{2,}\/*\S*$/);
+    }
   }
 });
 
