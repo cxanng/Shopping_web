@@ -135,7 +135,7 @@ describe('User Inteface', () => {
       const errorMsg =
         'Navigated to "/register.html" and tried to register following user: ' +
         `{ name: ${newCustomer.name}, email: ${newCustomer.email}, password: ${newCustomer.password} } ` +
-        `and then navigated to ${usersPage} and expected to find a new user (h3 with text content of ${newCustomer.name}) ` +
+        `and then navigated to ${usersPage} and expected to find a new user (h2 with text content of ${newCustomer.name}) ` +
         'however it could not be found.';
 
       await page.goto(registrationPage, { waitUntil: 'networkidle0' });
@@ -150,7 +150,7 @@ describe('User Inteface', () => {
 
       // navigate to "/users.html" and check to see if the new user can be found
       await page.goto(usersPage, { waitUntil: 'networkidle0' });
-      const nameElement = await page.$x(`//h3[contains(., '${newCustomer.name}')]`);
+      const nameElement = await page.$x(`//h2[contains(., '${newCustomer.name}')]`);
       let nameText = '';
 
       try {
