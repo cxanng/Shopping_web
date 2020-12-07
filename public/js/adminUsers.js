@@ -32,7 +32,7 @@
  *       - Deleting a user successfully should show a notification message "Deleted user {User Name}"
  *       - Use createNotification() function from utils.js to create notifications
  */
-setLogInText();
+
 const template = document.getElementById("user-template");
 const formTemplate = document.getElementById("form-template");
 const container = document.getElementById("users-container");
@@ -116,7 +116,6 @@ const renderPeople = people => {
 const adminUser = async () => {
   const people = await getJSON(URL);
   renderPeople(people);
-  // TODO: handle message tell unsigned-in customers to sign in
 };
 
 adminUser();

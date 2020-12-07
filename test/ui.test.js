@@ -8,7 +8,6 @@ chai.use(chaiHttp);
 
 const User = require('../models/user');
 const Product = require('../models/product');
-const { verifyLoginUser } = require('../auth/auth');
 
 // helper function for creating randomized test data
 const generateRandomString = (len = 9) => {
@@ -91,14 +90,7 @@ describe('User Inteface', () => {
     await User.create(users);
     allUsers = await User.find({});
 
-    await page.goto(baseUrl);
-    const user = await verifyLoginUser(adminUser);
-    await page.evaluate(user => {
-      if (localStorage.getItem("logged-in")) {
-        return;
-      }
-      localStorage.setItem("logged-in", JSON.stringify(user));
-    }, user);
+    await page.authenticate({ username: adminUser.email, password: adminUser.password });
   });
 
   describe('UI: List all users', () => {

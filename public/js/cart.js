@@ -1,5 +1,3 @@
-setLogInText();
-
 const template = document.getElementById("cart-item-template");
 const container = document.getElementById("cart-container");
 
@@ -14,6 +12,8 @@ const getAllProductsFromCart = async () => {
 };
 
 const renderCart = async () => {
+  // TODO: handle message tell customer to log in first
+
   const products = await getAllProductsFromCart();
   products.forEach(product => {
     const id = product.item._id;

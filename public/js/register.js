@@ -7,7 +7,7 @@
  *       - Reset the form back to empty after successful registration
  *       - Use postOrPutJSON() function from utils.js to send your data back to server
  */
-setLogInText();
+
 document.getElementById("btnRegister").addEventListener("click", e => {
   e.preventDefault();
   const form = document.getElementById("register-form");

@@ -4,6 +4,21 @@ const responseUtils = require('../../utils/responseUtils');
 const expect = chai.expect;
 
 describe('Response Utils', () => {
+  describe('basicAuthChallenge()', () => {
+    it('should set response status to 401', () => {
+      const response = createResponse();
+      responseUtils.basicAuthChallenge(response);
+      expect(response.statusCode).to.equal(401);
+    });
+
+    it('should set response header "WWW-Authenticate" to "Basic"', () => {
+      const response = createResponse();
+      responseUtils.basicAuthChallenge(response);
+      expect(response.hasHeader('www-authenticate')).to.be.true;
+      expect(response.getHeader('www-authenticate')).to.equal('Basic');
+    });
+  });
+
   describe('sendJson()', () => {
     const payload = { a: 1, b: 2, c: 3 };
 

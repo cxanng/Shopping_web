@@ -1,18 +1,26 @@
 /**
- * Decode and return JWT token from Authorization hear
+ * Decode, parse and return user credentials (username and password)
+ * from the Authorization header.
  *
  * @param {http.incomingMessage} request request object
- * @returns {string|null} token or null if token is missing
+ * @returns {Array|null} [username, password] or null if header is missing
  */
 const getCredentials = request => {
+  // TODO: 8.4 Parse user credentials from the "Authorization" request header
+  // NOTE: The header is base64 encoded as required by the http standard.
+  //       You need to first decode the header back to its original form ("email:password").
+  //  See: https://attacomsian.com/blog/nodejs-base64-encode-decode
+  //       https://stackabuse.com/encoding-and-decoding-base64-strings-in-node-js/
+  // throw new Error('Not Implemented');
   if (!request.headers["authorization"]) {
     return null;
   }
   const code = request.headers["authorization"];
-  if (!code.toLowerCase().startsWith("bearer ")) {
+  if (!code.startsWith("Basic")) {
     return null;
   }
-  return code.substring(7);
+  const buff = Buffer.from(code.split(" ")[1], "base64");
+  return buff.toString("ascii").split(":");
 };
 
 /**
