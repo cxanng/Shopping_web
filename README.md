@@ -10,8 +10,14 @@ resposible for:
 - managing packages, including prettier plugin for cleaner coding
 
 Member2:  The Anh Nguyen, anh.t.nguyen@tuni.fi, H292126, 
-resposible for: Implementing models for user, order, product; controller for user, product, order; modifying public HTML files; add addProduct, order HTML files; implement view for order, addProduct rendering; implement product adding, modifying and deleting; APIs for products, orders in routes.
-
+resposible for: 
+- Implementing models for user, order, product
+- Implementing controller for user, product, order 
+- Modifying public HTML files; add addProduct, order HTML files
+- Implement view for order, addProduct rendering
+- Implement product adding, modifying and deleting
+- APIs for products, orders in routes
+- Write Product schema related tests
 
 
 # WebDev1 coursework assignment
@@ -48,9 +54,9 @@ A web shop with vanilla HTML, CSS.
 └── test                    --> tests
 │   ├── auth                --> Authorization test
 │   ├── controllers         --> Method tests
-│   ├── models              --> Schema tests
+│   ├── models              --> User Schema tests
 │   ├── utils               --> utilities tests for request and response
-└── └── own                 --> TODO
+└── └── own                 --> Product Schema tests
 
 
 ```
@@ -76,6 +82,7 @@ The system follows MVC structure, which means interactions between Model and Vie
 ## Tests and documentation
 
 TODO: Links to at least 10 of your group's GitLab issues, and their associated Mocha tests and test files.
+
 
 ## Security concerns
 
