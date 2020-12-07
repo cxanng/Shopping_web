@@ -13,7 +13,7 @@ const NOT_FOUND_TEMPLATE = path.resolve(__dirname, "../public/404.html");
 const renderPublic = (filePath, response) => {
   if (!filePath) return renderNotFound(response);
 
-  const [_, ext] = splitPath(filePath);
+  const [, ext] = splitPath(filePath);
   const contentType = getContentType(ext);
   const fullPath = getFullFilePath(filePath);
 
