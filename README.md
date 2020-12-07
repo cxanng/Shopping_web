@@ -83,13 +83,21 @@ The system follows MVC structure, which means interactions between Model and Vie
 
 TODO: Links to at least 10 of your group's GitLab issues, and their associated Mocha tests and test files.
 
+# Additional features
+1. Jsonwebtoken (JWT) and login page  
+- We have added a new page for user to login. User must login in order to access other pages. At this time, we are using server-side rendering, so we let the server to handle the permissions regarding accessibilies to pages and functionalities.
+- We change the authentication method to JWT. The token, once signed by the server, would be sent back to the client and stored in the localStorage. This way of storing token is quite vulnerable to XSS attacks. More reasons would be discussed further in Security section.
 
 ## Security concerns
 
-* Json web token
+* Json web token  
 Currently, the token is saved in browser's localStorage. This is highly vulnerable as XSS can easily happen due to the fact that the token
-is available to all scripts. We thought about saving the token to HttpOnly Cookies, but this would require whole reimplementation as well
-as tests fixing. Therefore, we let the browser to save that token.
+is available to all JavaScript. We thought about saving the token to HttpOnly Cookies, but this would require whole reimplementation as well
+as tests fixing. In fact, both HttpOnly Cookies and localStorage are vulnerable to XSS attacks in some ways if the web itself does not do
+well to prevent such attacks.  
+Cookies are safer in a sense that attackers cannot get the token for later uses, but if they can send the request to server, the token is
+attached with the request automatically, and this is also harmful for the client. Most importantly, cookies are vulnerable to CSRF attacks.
+This can be mitigated using sameSite flag or some sort of anti-CSRF tokens.
 
 TODO: list the security threats represented in the course slides.
 Document how your application protects against the threats.
