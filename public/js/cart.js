@@ -22,7 +22,7 @@ const renderCart = async () => {
     const itemRow = newProduct.querySelector(".item-row");
     itemRow.setAttribute("id", `product-${id}`);
 
-    const name = itemRow.querySelector("h3");
+    const name = itemRow.querySelector("h2");
     name.setAttribute("id", `name-${id}`);
     name.innerText = product.item.name;
 
