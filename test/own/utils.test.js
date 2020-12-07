@@ -85,7 +85,7 @@ describe('Schema validation', () => {
       expect(error).to.exist; 
   });
 
-  it('must not allow "price" to be 0', () => {
+  it('must not allow "price" to less than 0', () => {
     const data = getTestData();
     data.price = -2.0;
     const product = new Product(data);
