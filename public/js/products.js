@@ -11,7 +11,7 @@ const renderProduct = products => {
     const itemRow = newProduct.querySelector("div");
     itemRow.setAttribute("id", `product-${id}`);
 
-    const name = itemRow.querySelector("h3");
+    const name = itemRow.querySelector("h2");
     name.setAttribute("id", `name-${id}`);
     name.innerText = product.name;
 

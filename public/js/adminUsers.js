@@ -89,7 +89,7 @@ const renderPeople = people => {
     const itemRow = newPerson.querySelector("div");
     itemRow.setAttribute("id", `user-${id}`);
 
-    const name = itemRow.querySelector("h3");
+    const name = itemRow.querySelector("h2");
     name.setAttribute("id", `name-${id}`);
     name.innerText = person.name;
 
