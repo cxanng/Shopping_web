@@ -67,6 +67,7 @@ footer {
 main {
   min-width: 1200px;
   background: url(https://cf.shopee.vn/file/26ed6efhttps://cf.shopee.vn/file/26ed6ef74ac3bf222fb73b0f751a44bd) center top / 100% no-repeat;
+  background-color: #e8e8e8;
 }
 
 .main-wrapper {
@@ -119,7 +120,7 @@ label {
 }
 
 button {
-  background-color: #1a5ead;
+  background-color: #ee4d2d;
   color: white;
   padding: 1.5rem 2rem;
   border: none;
@@ -145,7 +146,7 @@ h1 {
 }
 
 img {
-  max-width: 600px;
+  max-width: 100%;
   height: auto;
   border-radius: 10px;
 }
@@ -154,6 +155,15 @@ img {
   font-size: 1.5em;
   text-decoration: solid;
   font-weight: 300;
+}
+
+.product-price {
+  color: #ee4d2d;
+  font-weight: 400;
+}
+
+.product-name {
+  color: #d0011b;
 }
 
 .order-row {
@@ -166,6 +176,18 @@ img {
 
 .item-row {
   max-width: 80%;
+  border: 1px solid transparent;
+  border-radius: .5rem;
+  box-shadow: 0 0.0625rem 0.125rem 0 rgba(0,0,0,.1);
+  background: #ffffff;
+  margin-bottom: .625rem;
+  margin-top: .625rem;
+  padding: 1rem;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.item-row:hover {
+  box-shadow: 0 0.4rem 0.8rem rgba(0,0,0,0.3);
 }
 
 .selected-page {
@@ -176,4 +198,8 @@ img {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   column-gap: 5%;
+}
+
+#notifications-container {
+  padding: 3rem auto 3rem auto;
 }
