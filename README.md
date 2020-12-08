@@ -8,6 +8,8 @@ resposible for:
 - add login functionality (use JWT)
 - migrating "local database" to use data persisted in MongoDB
 - managing packages, including prettier plugin for cleaner coding
+- writing tests for sorting functionalities
+- refactoring CSS
 
 Member2:  The Anh Nguyen, anh.t.nguyen@tuni.fi, H292126, 
 resposible for: 
@@ -61,17 +63,12 @@ A web shop with vanilla HTML, CSS.
 
 ```
 
-TODO: describe added files here and give them short descriptions
-    - HTML, js files related to order, login, add products
-    - order and product model files in models folder
-    - images of diagrams
-
 ## The architecture 
 The system follows MVC structure. In this architecture, client's request would go through a router, which would call logics in Controller. Controller would communicate with the Models to get the data to handle the logics. Models communicates with our database, which is MongoDB, to bring data to Controller. Static web page will be sent as HTML via the View to client to render.database.
     ![MVC Diagram](./public/images/MVC.png "MVC diagram")
 
 Ofcourse, the request should be authenticated before and further logics happen. The final system support authentication which allows user to access suitable rights with their roles. Authentication is done using Basic Authentication in master branch, and JWT in "JWT" branch.  
-The backend is built following REST api. Some example operations are:
+The backend is built following REST api using NodeJS. Some example operations are:
 - User
   - Add user (POST)
   - Delete user (DELETE)
@@ -88,12 +85,20 @@ Below are sequence diagrams of specific actions that each role can get access to
 
 ## Tests and documentation
 
-TODO: Links to at least 10 of your group's GitLab issues, and their associated Mocha tests and test files.
+1. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/21: test/own/ui.test.js
+2. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/19: all in test folder, in branch JWT
+3. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/15: test/own/utils.test.js
 
 # Additional features
-1. Jsonwebtoken (JWT) and login page (branch JWT)  
+1. Jsonwebtoken (JWT) and login page (in JWT branch)  
 - We have added a new page for user to login. User must login in order to access other pages. At this time, we are using server-side rendering, so we let the server to handle the permissions regarding accessibilies to pages and functionalities.
 - We change the authentication method to JWT. The token, once signed by the server, would be sent back to the client and stored in the localStorage. This way of storing token is quite vulnerable to XSS attacks. More reasons would be discussed further in Security section.
+2. Sorting (in master branch)  
+We have implemented the buttons to sort the products in different orders.
+- Sort by name, increasing
+- Sort by name, decreasing
+- Sort by price, increasing
+- Sort by price, decreasing
 
 ## Security concerns
 
