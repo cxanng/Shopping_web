@@ -90,6 +90,33 @@ Below are sequence diagrams of specific actions that each role can get access to
 
 TODO: Links to at least 10 of your group's GitLab issues, and their associated Mocha tests and test files.
 
+1. [Customer can sort products by name][test1]
+2. [Customer can wort products by price][test2]
+3. [Product's name must be given][test3]
+4. [Product's name must not be empty][test4]
+5. [Product's name must not contain only spaces][test5]
+6. [Product's name must not exceed 50 characters][test6]
+7. [Product's image url must be legal][test7]
+8. [Product's price must be given][test8]
+9. [Product's price must not be zero nor negative][test9]
+10. [Product's price must be a number][test10]
+
+[Mocha test and test File associated tests 1 and 2][test11]
+[Mocha test and test File associated remaining tests][test12]
+
+[test1]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/2
+[test2]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/5
+[test3]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/9
+[test4]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/11
+[test5]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/12
+[test6]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/13
+[test7]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/23
+[test8]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/14
+[test9]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/15
+[test10]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/17
+[test11]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/blob/master/test/own/ui.test.js
+[test12]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/blob/master/test/own/utils.test.js
+
 # Additional features
 1. Jsonwebtoken (JWT) and login page (branch JWT)  
 - We have added a new page for user to login. User must login in order to access other pages. At this time, we are using server-side rendering, so we let the server to handle the permissions regarding accessibilies to pages and functionalities.
