@@ -85,10 +85,6 @@ Below are sequence diagrams of specific actions that each role can get access to
 
 ## Tests and documentation
 
-1. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/21: test/own/ui.test.js
-2. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/19: all in test folder, in branch JWT
-3. https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/15: test/own/utils.test.js
-
 1. [Customer can sort products by name][test1]
 2. [Customer can wort products by price][test2]
 3. [Product's name must be given][test3]
@@ -101,6 +97,7 @@ Below are sequence diagrams of specific actions that each role can get access to
 10. [Product's price must be a number][test10]
 
 [Mocha test and test File associated tests 1 and 2][test11]
+
 [Mocha test and test File associated remaining tests][test12]
 
 [test1]: https://course-gitlab.tuni.fi/webdev1-2020-2021/webdev1-group-75/-/issues/2
