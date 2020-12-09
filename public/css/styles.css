@@ -24,13 +24,14 @@ footer {
   padding: 1rem 2.5rem;
 }
 
-header,
-footer {
-  background-color: #eee;
+header {
+  background-color: #f53d2d;
 }
 
 footer {
+  background-color: #eee;
   font-size: 1.5em;
+  border-top: #f53d2d solid;
 }
 
 .navbar {
@@ -47,10 +48,31 @@ footer {
 }
 
 .nav-links li {
-  padding: 0 1.5rem;
+  padding: 1.5rem;
   font-size: 1.5em;
   overflow-wrap: break-word;
   text-align: center;
+  border-right: 1px solid hsla(0,0%,100%,.22);
+}
+
+.nav-links :last-child {
+  border-right: none;
+}
+
+.nav-links li a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+main {
+  min-width: 1200px;
+  background: url(https://cf.shopee.vn/file/26ed6efhttps://cf.shopee.vn/file/26ed6ef74ac3bf222fb73b0f751a44bd) center top / 100% no-repeat;
+  background-color: #e8e8e8;
+}
+
+.main-wrapper {
+  margin: 0px 8% 4.375rem 8%;
+  color: rgba(0, 0, 0, .8);
 }
 
 .title {
@@ -98,7 +120,7 @@ label {
 }
 
 button {
-  background-color: #282d74;
+  background-color: #ee4d2d;
   color: white;
   padding: 1.5rem 2rem;
   border: none;
@@ -118,8 +140,13 @@ button:hover {
   background-color: red;
 }
 
+h1 {
+  color: #ee4d2d;
+  margin-bottom: 6rem;
+}
+
 img {
-  max-width: 500px;
+  max-width: 100%;
   height: auto;
   border-radius: 10px;
 }
@@ -130,10 +157,49 @@ img {
   font-weight: 300;
 }
 
+.product-price {
+  color: #ee4d2d;
+  font-weight: 400;
+}
+
+.product-name {
+  color: #d0011b;
+}
+
 .order-row {
   background-color: lightcyan;
   padding-left: 2px;
   margin: auto;
   border-width: 1px;
   border-style: solid;
+}
+
+.item-row {
+  max-width: 80%;
+  border: 1px solid transparent;
+  border-radius: .5rem;
+  box-shadow: 0 0.0625rem 0.125rem 0 rgba(0,0,0,.1);
+  background: #ffffff;
+  margin-bottom: .625rem;
+  margin-top: .625rem;
+  padding: 1rem;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.item-row:hover {
+  box-shadow: 0 0.4rem 0.8rem rgba(0,0,0,0.3);
+}
+
+.selected-page {
+  border-bottom: 3px #ffffff solid;
+}
+
+#products-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 5%;
+}
+
+#notifications-container {
+  padding: 3rem auto 3rem auto;
 }
