@@ -1,4 +1,4 @@
-# Group 
+# Group 75
 
 Member1:  Duy Anh Vu, duy.a.vu@tuni.fi, H294381, 
 resposible for:
@@ -25,6 +25,11 @@ resposible for:
 # WebDev1 coursework assignment
 
 A web shop with vanilla HTML, CSS.
+
+# Links to Heroku applications
+
+1. https://webdevgroup75.herokuapp.com/ - master branch, with CSS changes, and without JWT. We submitted this one
+2. https://webdev75.herokuapp.com/ - JWT branch, with JWT authentication, and without CSS changes.
 
 
 ### The project structure
@@ -86,7 +91,7 @@ Below are sequence diagrams of specific actions that each role can get access to
 ## Tests and documentation
 
 1. [Customer can sort products by name][test1]
-2. [Customer can wort products by price][test2]
+2. [Customer can sort products by price][test2]
 3. [Product's name must be given][test3]
 4. [Product's name must not be empty][test4]
 5. [Product's name must not contain only spaces][test5]
@@ -135,7 +140,13 @@ Cookies are safer in a sense that attackers cannot get the token for later uses,
 attached with the request automatically, and this is also harmful for the client. Most importantly, cookies are vulnerable to CSRF attacks.
 This can be mitigated using sameSite flag or some sort of anti-CSRF tokens.
 
-TODO: list the security threats represented in the course slides.
-Document how your application protects against the threats.
-You are also free to add more security threats + protection here, if you will.
+* Other things
+1. XSS: We have prevented some dangerous input from users into the forms. However, for the non-persistent XSS, we have not tested it carefully,
+but from some preliminary tests, it seems to be prevented.
+2. Session hijacking: We have not taken any action to mitigate this. This attack is very likely to happen to our app as the authentication
+is not strong enough.
+3. CSRF: We did not protect this attack too carefully. It is quite liably to happen, especially when admins are logged in. Their request
+would contain the cookie automatically, so attackers can definitely make a call to the API.
+4. SQL/NOSQL injection: We are using MongoDB, which can be vulnerable to NOSQL injection due to the free-form of JSON documents. We already have
+some checkings to ensure the data coming to MongoDB is following the predefined schema (Ofcourse we do not leak the database error to client).
 
